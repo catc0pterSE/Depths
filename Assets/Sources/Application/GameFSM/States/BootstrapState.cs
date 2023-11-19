@@ -9,7 +9,7 @@ using Sources.Infrastructure.Core.Services.DI;
 using Sources.Infrastructure.Core.Services.Providers;
 using UnityEngine;
 
-namespace Sources.Application
+namespace Sources.Application.GameFSM.States
 {
     public class BootstrapState : IState
     {

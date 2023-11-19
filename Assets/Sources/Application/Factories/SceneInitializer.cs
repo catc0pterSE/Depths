@@ -4,7 +4,7 @@ using Sources.Application.CompositionRoots;
 using Sources.Infrastructure.Core.Services.DI;
 using Object = UnityEngine.Object;
 
-namespace Sources.Application
+namespace Sources.Application.Factories
 {
     public class SceneInitializer
     {

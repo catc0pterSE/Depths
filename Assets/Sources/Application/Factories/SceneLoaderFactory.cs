@@ -2,7 +2,7 @@ using Sources.Infrastructure.Api.Services;
 using Sources.Infrastructure.Core;
 using UnityEngine;
 
-namespace Sources.Application
+namespace Sources.Application.Factories
 {
     internal class SceneLoaderFactory
     {
