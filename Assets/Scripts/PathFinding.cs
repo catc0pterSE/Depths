@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class PathFinding
@@ -7,54 +8,54 @@ public class PathFinding
     private const int MoveDiagonalCost = 14;
 
     private readonly IGrid _gridPN;
-        
-    private List<PathNode> _openList;
-    private List<PathNode> _closedList;
+
+    private List<CellData> _openList;
+    private List<CellData> _closedList;
 
     public PathFinding(IGrid gridPn) =>
         _gridPN = gridPn;
 
-    public List<PathNode> FindPath(Vector3 startPosition, Vector3 finishPosition)
+    public List<Cell> FindPath(Vector3 startPosition, Vector3 finishPosition)
     {
-        PathNode startNode = _gridPN.GetElement(startPosition);
-        PathNode endNode = _gridPN.GetElement(finishPosition);
+        CellData startCell = _gridPN.Cells[_gridPN.GetElement(startPosition)];
+        CellData endCell = _gridPN.Cells[_gridPN.GetElement(finishPosition)];
 
-        _openList = new List<PathNode> { startNode };
-        _closedList = new List<PathNode>();
+        _openList = new List<CellData> { startCell };
+        _closedList = new List<CellData>();
 
-        SetStatsNode(startNode, 0, endNode);
+        SetStatsCell(startCell, 0, endCell);
 
         while (_openList.Count > 0)
         {
-            PathNode currentNode = GetLowestTotalCostNode(_openList);
+            CellData currentCell = GetLowestTotalCostNode(_openList);
 
-            if (currentNode == endNode)
-                return CalculatePath(endNode);
+            if (currentCell == endCell)
+                return CalculatePath(endCell);
 
-            _openList.Remove(currentNode);
-            _closedList.Add(currentNode);
+            _openList.Remove(currentCell);
+            _closedList.Add(currentCell);
 
-            foreach (var neighbourNode in GetNeighbourList(currentNode))
+            foreach (var neighbourCell in currentCell.Neighbours)
             {
-                if (_closedList.Contains(neighbourNode))
+                if (_closedList.Contains(neighbourCell))
                     continue;
 
-                if (neighbourNode.isWalkable == false)
+                if (neighbourCell.isWalkable == false)
                 {
-                    _closedList.Add(neighbourNode);
+                    _closedList.Add(neighbourCell);
                     continue;
                 }
 
                 int tentativeTransitionCost =
-                    currentNode.TransitionCost + CalculateDistanceCost(currentNode, neighbourNode);
+                    currentCell.TransitionCost + CalculateDistanceCost(currentCell, neighbourCell);
 
-                if (tentativeTransitionCost < neighbourNode.TransitionCost)
+                if (tentativeTransitionCost < neighbourCell.TransitionCost)
                 {
-                    neighbourNode.ComeFromNode = currentNode;
-                    SetStatsNode(neighbourNode, tentativeTransitionCost, endNode);
+                    neighbourCell.ComeFromCell = currentCell;
+                    SetStatsCell(neighbourCell, tentativeTransitionCost, endCell);
 
-                    if (_openList.Contains(neighbourNode) == false)
-                        _openList.Add(neighbourNode);
+                    if (_openList.Contains(neighbourCell) == false)
+                        _openList.Add(neighbourCell);
                 }
             }
         }
@@ -62,65 +63,47 @@ public class PathFinding
         return null;
     }
 
-    private List<PathNode> GetNeighbourList(PathNode currentNode)
+    private List<Cell> CalculatePath(CellData node)
     {
-        List<PathNode> neighbourList = new List<PathNode>();
+        var path = new List<CellData> { node };
 
-        for (int x = -1; x <= 1; x++)
+        CellData currentNode = node;
+        while (currentNode.ComeFromCell != null)
         {
-            for (int y = -1; y <= 1; y++)
-            {
-                PathNode pathNode =
-                    _gridPN.GetElement(currentNode.ArrayPosition.x + x, currentNode.ArrayPosition.y + y);
-
-                if (pathNode == null || currentNode == pathNode)
-                    continue;
-
-                neighbourList.Add(pathNode);
-            }
-        }
-
-        return neighbourList;
-    }
-
-    private List<PathNode> CalculatePath(PathNode node)
-    {
-        var path = new List<PathNode> { node };
-
-        PathNode currentNode = node;
-        while (currentNode.ComeFromNode != null)
-        {
-            path.Add(currentNode.ComeFromNode);
-            currentNode = currentNode.ComeFromNode;
+            path.Add(currentNode.ComeFromCell);
+            currentNode = currentNode.ComeFromCell;
         }
 
         path.Reverse();
-        return path;
+        return ConvertColl(path);
     }
 
-    private PathNode GetLowestTotalCostNode(List<PathNode> openList)
+    private CellData GetLowestTotalCostNode(IReadOnlyCollection<CellData> openList) => 
+        openList.FirstOrDefault(element => element.TotalCost == openList.Min(element => element.TotalCost));
+
+    private int CalculateDistanceCost(CellData firstCell, CellData secondCell)
     {
-        PathNode lowestTotalCostNode = openList[0];
+        var first = GetCell(firstCell);
+        var second = GetCell(secondCell);
 
-        for (int i = 1; i < openList.Count; i++)
-            if (openList[i].TotalCost < lowestTotalCostNode.TotalCost)
-                lowestTotalCostNode = openList[i];
-
-        return lowestTotalCostNode;
-    }
-
-    private int CalculateDistanceCost(PathNode first, PathNode second)
-    {
-        int xDistance = Mathf.Abs(first.ArrayPosition.x - second.ArrayPosition.x);
-        int yDistance = Mathf.Abs(first.ArrayPosition.y - second.ArrayPosition.y);
+        int xDistance = Mathf.Abs(first.MapPosition.x - second.MapPosition.x);
+        int yDistance = Mathf.Abs(first.MapPosition.y - second.MapPosition.y);
         int remaining = Mathf.Abs(xDistance - yDistance);
+
         return MoveDiagonalCost * Mathf.Min(xDistance, yDistance) + MoveStraightCost * remaining;
     }
 
-    private void SetStatsNode(PathNode nodeStats, int TransitionCost, PathNode targetNode)
+    private void SetStatsCell(CellData nodeStats, int TransitionCost, CellData targetNode)
     {
         nodeStats.SetTransitionCost(TransitionCost);
         nodeStats.SetWayToFinalCell(CalculateDistanceCost(nodeStats, targetNode));
         nodeStats.CalculateTotalCost();
     }
+
+    private Cell GetCell(CellData cellData) =>
+        _gridPN.Cells.Where(element => element.Value == cellData).Select(element => _gridPN.GetElement(element.Key.MapPosition))
+            .FirstOrDefault();
+
+    private List<Cell> ConvertColl(IEnumerable<CellData> path) =>
+        path.Select(GetCell).ToList();
 }

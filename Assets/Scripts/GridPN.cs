@@ -1,14 +1,19 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using System.Linq;
+using UnityEngine;
 
 public class GridPN : IGrid
 {
-    private readonly PoolPathNods _poolPathNods;
-    private readonly PathNode[,] _map;
+    private readonly PoolPathCell _poolPathCell;
+    private readonly Cell[,] _map;
 
-    public GridPN(Vector2Int size, PoolPathNods poolPathNods)
+    public Dictionary<Cell, CellData> Cells { get; }
+
+    public GridPN(Vector2Int size, PoolPathCell poolPathCell)
     {
-        _map = new PathNode[size.x, size.y];
-        _poolPathNods = poolPathNods;
+        _map = new Cell[size.x, size.y];
+        _poolPathCell = poolPathCell;
+        Cells = new Dictionary<Cell, CellData>();
     }
 
     public void Create()
@@ -17,45 +22,79 @@ public class GridPN : IGrid
         {
             for (var y = 0; y < _map.GetLength(0); y++)
             {
-                var pathNode = _poolPathNods.GetFreeNode();
-                pathNode.transform.position = new Vector3(x, 0, y);
+                var cell = _poolPathCell.GetFreeCell();
+                cell.transform.position = new Vector3(x, 0, y);
 
-                _map[x, y] = pathNode;
-                pathNode.Initialize(x, y);
-
-                SetColorMap(pathNode, Color.grey);
+                _map[x, y] = cell;
+                cell.Initialize(x, y);
+                
+                Cells.Add(cell, new CellData());
+                
+                SetColorMap(cell, Color.grey);
             }
         }
+
+        SetAllNeighbours();
     }
 
-    private static void SetColorMap(PathNode pathNode, Color color)
+    private void SetAllNeighbours()
     {
-        int X = pathNode.ArrayPosition.x;
-        int Y = pathNode.ArrayPosition.y;
-
-        if ((X % 2 != 0 && Y % 2 == 0) || (X % 2 == 0 && Y % 2 != 0))
-            pathNode.DefaultColor(color);
+        foreach (var cell in Cells) 
+            cell.Value.SetNeighbours(GerNeighbourPosition(cell.Key));
     }
 
-    public PathNode GetElement(int arrayPositionX, int arrayPositionY)
+    private List<CellData> GerNeighbourPosition(Cell cell) => 
+        GetNeighbourList(cell).Select(currentCell => Cells[currentCell]).ToList();
+
+    private List<Cell> GetNeighbourList(Cell currentNode)
     {
-        if (arrayPositionX < 0 || arrayPositionY < 0)
+        List<Cell> neighbourList = new List<Cell>();
+
+        for (int x = -1; x <= 1; x++)
+        {
+            for (int y = -1; y <= 1; y++)
+            {
+                Cell cell =
+                    GetElement(new Vector2Int(currentNode.MapPosition.x + x, currentNode.MapPosition.y + y));
+
+                if (cell == null || currentNode == cell)
+                    continue;
+
+                neighbourList.Add(cell);
+            }
+        }
+
+        return neighbourList;
+    }
+
+    public Cell GetElement(Vector2Int position)
+    {
+        if (position.x < 0 || position.y < 0)
             return null;
 
-        if (arrayPositionX > _map.GetLength(0) - 1 || arrayPositionY > _map.GetLength(1) - 1)
+        if (position.x > _map.GetLength(0) - 1 ||  position.y > _map.GetLength(1) - 1)
             return null;
 
-        return _map[arrayPositionX, arrayPositionY];
+        return _map[position.x,  position.y];
     }
 
-    public PathNode GetElement(Vector3 position)
+    public Cell GetElement(Vector3 position)
     {
-        PathNode pathNode = null;
+        Cell cell = null;
 
         foreach (var element in _map)
             if (element.Position == position)
-                pathNode = element;
+                cell = element;
 
-        return pathNode;
+        return cell;
+    }
+
+    private void SetColorMap(Cell cell, Color color)
+    {
+        int X = cell.MapPosition.x;
+        int Y = cell.MapPosition.y;
+
+        if ((X % 2 != 0 && Y % 2 == 0) || (X % 2 == 0 && Y % 2 != 0))
+            cell.SetDefaultColor(color);
     }
 }

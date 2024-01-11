@@ -3,19 +3,20 @@ using UnityEngine;
 
 public class LevelPN : MonoBehaviour
 {
-    [SerializeField] private PoolPathNods _poolPathNods;
+    [SerializeField] private PoolPathCell poolPathCell;
     [SerializeField] private Vector2Int _sizeGrid;
     [SerializeField] private CameraRay _cameraRay;
 
     private Vector3 _startPosition;
     private Vector3 _finishPosition;
-    private GridPN _grid;
+
+    private IGrid _grid;
     private PathFinding _pathFinding;
-    private List<PathNode> _path;
+    private List<Cell> _path;
 
     private void Awake()
     {
-        _grid = new GridPN(_sizeGrid, _poolPathNods);
+        _grid = new GridPN(_sizeGrid, poolPathCell);
         _pathFinding = new PathFinding(_grid);
     }
 
@@ -26,32 +27,30 @@ public class LevelPN : MonoBehaviour
     {
         SetFinishPosition();
         SetStartPosition();
+        
         SetNotWalkingNode();
-        Reset();
         FindPath();
     }
 
-    private bool SetFinishPosition()
+    private void SetFinishPosition()
     {
-        if (Input.GetMouseButtonDown(1))
+        if (Input.GetMouseButtonUp(0))
         {
-            PathNode finishNode = _cameraRay.GetNode();
+            Cell startNode = _cameraRay.GetNode();
 
-            if (finishNode == null)
-                return true;
+            if (startNode == null)
+                return;
 
-            _finishPosition = finishNode.Position;
-            SetColorElement(finishNode, Color.red);
+            _finishPosition = startNode.Position;
+            SetColorElement(startNode, Color.red);
         }
-
-        return false;
     }
 
     private void SetStartPosition()
     {
         if (Input.GetMouseButtonDown(0))
         {
-            PathNode startNode = _cameraRay.GetNode();
+            Cell startNode = _cameraRay.GetNode();
 
             if (startNode == null)
                 return;
@@ -70,35 +69,21 @@ public class LevelPN : MonoBehaviour
             if (_path == null)
                 return;
 
-            for (int i = 1; i < _path.Count - 1; i++) 
+            for (int i = 1; i < _path.Count - 1; i++)
                 SetColorElement(_path[i], Color.yellow);
-        }
-    }
-
-    private void Reset()
-    {
-        if (Input.GetKey(KeyCode.R))
-        {
-            foreach (var node in _path) 
-                node.SetColor(node.DefaultColorNode);
-
-            _startPosition = Vector3.zero;
-            _finishPosition = Vector3.zero;
-            
-            _path.Clear();
         }
     }
 
     private void SetNotWalkingNode()
     {
-        if (Input.GetMouseButtonDown(2))
+        if (Input.GetMouseButtonDown(1))
         {
-            PathNode pathNode = _cameraRay.GetNode();
-            pathNode.SetImpassable();
-            SetColorElement(pathNode, Color.black);
+            Cell cell = _cameraRay.GetNode();
+            _grid.Cells[cell].SetImpassable();
+            SetColorElement(cell, Color.black);
         }
     }
 
-    private void SetColorElement(Component node, Color color) =>
-        node.GetComponent<Renderer>().material.color = color;
+    private void SetColorElement(Cell node, Color color) =>
+        node.SetColor(color);
 }

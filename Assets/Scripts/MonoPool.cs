@@ -2,24 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using Object = UnityEngine.Object;
 
 public class PoolMono<T> where T : MonoBehaviour
 {
-    [SerializeField] private T _prefab { get; }
+    private T _prefab { get; }
 
     private readonly bool _autoExpand;
     private readonly Transform _container;
+    private readonly IFactory<T> _factory;
 
     private List<T> _pool;
 
-    public PoolMono(T prefab, int count, Transform container, bool autoExpand = true)
+    public PoolMono(T prefab, int startCount, Transform container, IFactory<T> factory, bool autoExpand = true)
     {
         _prefab = prefab;
         _container = container;
+        _factory = factory; 
         _autoExpand = autoExpand;
 
-        CreatePool(count);
+        CreatePool(startCount);
     }
 
     public T GetFreeElement()
@@ -33,12 +34,9 @@ public class PoolMono<T> where T : MonoBehaviour
         throw new Exception($"There is no free element in pool of type {typeof(T)}");
     }
 
-    public List<T> GetActiveElements() => 
-        _pool.Where(element => element.isActiveAndEnabled).ToList();
-
     private T CreateObject(bool isActiveByDefault = false)
     {
-        var createdObject = Object.Instantiate(_prefab, _container);
+        var createdObject = _factory.Create(_prefab, _container);
         createdObject.gameObject.SetActive(isActiveByDefault);
         _pool.Add(createdObject);
         return createdObject;

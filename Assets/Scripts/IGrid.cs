@@ -1,8 +1,10 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 public interface IGrid
 {
+    public Dictionary<Cell, CellData> Cells { get; }
     public void Create();
-    public PathNode GetElement(int arrayPositionX, int arrayPositionY);
-    public PathNode GetElement(Vector3 position);
+    public Cell GetElement(Vector2Int position);
+    public Cell GetElement(Vector3 position);
 }
