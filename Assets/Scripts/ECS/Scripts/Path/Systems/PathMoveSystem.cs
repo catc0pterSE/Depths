@@ -1,4 +1,5 @@
 using Leopotam.Ecs;
+using UnityEngine;
 
 namespace ECS.Boot
 {
@@ -19,7 +20,9 @@ namespace ECS.Boot
                 ref var position = ref _unitsPath.Get2(index).value;
                 ref var points = ref _unitsPath.Get3(index);
                 
-                var dir = points.value[points.index].Position - position;
+                var cellView = points.value[points.index];
+                
+                var dir = cellView.Position - position;
                 dir.y = 0;
                 
                 if(dir.sqrMagnitude < 0.01f)
@@ -33,7 +36,7 @@ namespace ECS.Boot
                     }
                 }
                 
-                position += dir.normalized * (_runtimeData.deltaTime * 10f);
+                position += dir.normalized * (_runtimeData.deltaTime * 5f);
             }
         }
     }

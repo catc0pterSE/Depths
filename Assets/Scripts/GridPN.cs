@@ -24,10 +24,14 @@ public class GridPN : IGrid
                 var cell = _poolPathCell.GetFreeCell();
                 cell.transform.position = new Vector3(x, 0, y);
 
+                
+                
                 _map[x, y] = cell;
                 cell.Initialize(x, y);
-                
-                Cells.Add(cell, new CellData());
+
+                var cellData = new CellData();
+                cell.Data = cellData;
+                Cells.Add(cell, cellData);
                 
                 SetColorMap(cell, Color.grey);
             }

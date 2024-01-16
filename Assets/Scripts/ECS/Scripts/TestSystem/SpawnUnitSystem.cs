@@ -18,7 +18,7 @@ namespace ECS.Boot
             var instanceObject = Object.Instantiate(_staticData.UnitPrefab);
             
             var entityUnit = _world.NewEntity();
-
+            
             entityUnit.Get<Unit>();
             entityUnit.Get<TransformRef>().value = instanceObject.transform;
             entityUnit.Get<Selected>();

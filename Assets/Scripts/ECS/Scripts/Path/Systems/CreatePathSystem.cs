@@ -3,6 +3,8 @@ using UnityEngine;
 
 namespace ECS.Boot
 {
+    // leo -> ищет все структуры Pool<T> generate array
+    // : 1000   entity -> iD  _filter -> ID -> Pool<T>(ID) -> COMPONENT
     public sealed class CreatePathSystem : IEcsRunSystem
     {
         private readonly EcsFilter<Unit, Position, Selected> _units;

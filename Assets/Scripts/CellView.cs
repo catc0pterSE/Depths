@@ -3,6 +3,9 @@
 public class CellView : MonoBehaviour
 {
     private Renderer _renderer;
+
+    public CellData Data;
+    
     private Color _defaultColor;
     
     public Vector2Int MapPosition { get; private set; }

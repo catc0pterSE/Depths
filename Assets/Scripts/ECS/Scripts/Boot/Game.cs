@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Leopotam.Ecs;
 using UnityEngine;
@@ -47,7 +48,6 @@ namespace ECS.Boot
 	        _runtimeData.deltaTime = Time.deltaTime;
             _systems?.Run();
         }
-
         void OnDestroy()
         {
             if (_systems != null)

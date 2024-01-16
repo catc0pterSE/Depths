@@ -2,6 +2,7 @@ using Leopotam.Ecs;
 
 namespace ECS.Boot
 {
+
     public sealed class UpdatePositionSystem : IEcsRunSystem
     {
         private readonly EcsFilter<TransformRef, Position> _syncPosition;

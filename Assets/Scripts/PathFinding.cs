@@ -1,7 +1,9 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Unity.Jobs;
+using UnityEditor.Experimental.GraphView;
 using UnityEngine;
-
 public class PathFinding
 {
     private const int MoveStraightCost = 10;
@@ -41,20 +43,30 @@ public class PathFinding
         while (_openList.Count > 0)
         {
             CellData currentCell = GetLowestTotalCostNode(_openList);
+            
+            
+            
             if (currentCell == endCell)
             {
-                _openList.Clear();
-                _closedList.Clear();
+                _closedList.Add(endCell);
                 
-                return CalculatePath(endCell);   
+                Debug.Log(_openList.Count);
+                Debug.Log(_closedList.Count);
+                
+                break;
             }
 
             _openList.Remove(currentCell);
             _closedList.Add(currentCell);
 
 
-            var cell = GetCell(currentCell);
-            _neignhbours = GetNeighbourList(cell.Position);
+            var cellView = GetCell(currentCell);
+            _neignhbours = GetNeighbourList(cellView.Position);
+
+            if (_neignhbours.Contains(currentCell))
+            {
+                Debug.Log(_neignhbours.Contains(currentCell));
+            }
             
             foreach (var neighbourCell in _neignhbours)
             {
@@ -74,18 +86,44 @@ public class PathFinding
                 {
                     neighbourCell.ComeFromCell = currentCell;
                     SetStatsCell(neighbourCell, tentativeTransitionCost, endCell);
-                    
-                    _openList.Add(neighbourCell);
+
+                    if (_openList.Contains(neighbourCell) == false)
+                    {
+                        _openList.Add(neighbourCell);
+                    }
                 }
             }
         }
         
+        
+        var path = CalculatePath(endCell);
+
+        path[0] = GetCell(startCell);
+        
+        foreach (var cellsKey in _openList)
+        {
+            cellsKey.ComeFromCell = null;
+            cellsKey.SetTransitionCost(int.MaxValue);
+        }
+        
+        foreach (var cellsKey in _closedList)
+        {
+            cellsKey.ComeFromCell = null;
+            cellsKey.SetTransitionCost(int.MaxValue);
+        }
+
         _openList.Clear();
         _closedList.Clear();
         
-        return null;
-    }
+        // foreach (var cellsKey in _gridPN.Cells.Values)
+        // {
+        //     cellsKey.ComeFromCell = null;
+        //     cellsKey.SetTransitionCost(int.MaxValue);
+        // }
 
+        
+        return path;
+    }
     private List<CellData> GetNeighbourList(Vector3 startCell)
     {
         _neignhbours.Clear();
@@ -109,15 +147,27 @@ public class PathFinding
     private List<CellView> CalculatePath(CellData node)
     {
         var path = new List<CellData> { node };
-
+        
+        Debug.Log(node);
+        Debug.Log(node.ComeFromCell);
+        
         CellData currentNode = node;
+
+
+        int count = 50;
         while (currentNode.ComeFromCell != null)
         {
             path.Add(currentNode.ComeFromCell);
             currentNode = currentNode.ComeFromCell;
-        }
 
+            if (path.Count == count)
+            {
+                break;
+            }
+        }
+        
         path.Reverse();
+        
         return ConvertColl(path);
     }
 
