@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-public class Cell : MonoBehaviour
+public class CellView : MonoBehaviour
 {
     private Renderer _renderer;
     private Color _defaultColor;

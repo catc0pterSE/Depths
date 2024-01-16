@@ -11,14 +11,14 @@ public class CameraRay : MonoBehaviour
     private void Awake() =>
         _camera = Camera.main;
 
-    public Cell GetNode()
+    public CellView GetNode()
     {
         var ray = _camera.ScreenPointToRay(Input.mousePosition);
 
         if (Physics.Raycast(ray, out var hit, MaxDistance, _layerMask) == false)
             return null;
 
-        if (hit.transform.gameObject.TryGetComponent(out Cell node) == false)
+        if (hit.transform.gameObject.TryGetComponent(out CellView node) == false)
             return null;
 
         return node;

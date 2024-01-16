@@ -5,15 +5,14 @@ using UnityEngine;
 public class GridPN : IGrid
 {
     private readonly PoolPathCell _poolPathCell;
-    private readonly Cell[,] _map;
-
-    public Dictionary<Cell, CellData> Cells { get; }
-
+    
+    private readonly CellView[,] _map;
+    public Dictionary<CellView, CellData> Cells { get; }
     public GridPN(Vector2Int size, PoolPathCell poolPathCell)
     {
-        _map = new Cell[size.x, size.y];
+        _map = new CellView[size.x, size.y];
         _poolPathCell = poolPathCell;
-        Cells = new Dictionary<Cell, CellData>();
+        Cells = new Dictionary<CellView, CellData>();
     }
 
     public void Create()
@@ -39,35 +38,35 @@ public class GridPN : IGrid
 
     private void SetAllNeighbours()
     {
-        foreach (var cell in Cells) 
-            cell.Value.SetNeighbours(GerNeighbourPosition(cell.Key));
+        // foreach (var cell in Cells) 
+        //     cell.Value.SetNeighbours(GerNeighbourPosition(cell.Key));
     }
 
-    private List<CellData> GerNeighbourPosition(Cell cell) => 
-        GetNeighbourList(cell).Select(currentCell => Cells[currentCell]).ToList();
+    private List<CellData> GerNeighbourPosition(CellView cellView) => 
+        GetNeighbourList(cellView).Select(currentCell => Cells[currentCell]).ToList();
 
-    private List<Cell> GetNeighbourList(Cell currentNode)
+    private List<CellView> GetNeighbourList(CellView currentNode)
     {
-        List<Cell> neighbourList = new List<Cell>();
+        List<CellView> neighbourList = new List<CellView>();
 
         for (int x = -1; x <= 1; x++)
         {
             for (int y = -1; y <= 1; y++)
             {
-                Cell cell =
+                CellView cellView =
                     GetElement(new Vector2Int(currentNode.MapPosition.x + x, currentNode.MapPosition.y + y));
 
-                if (cell == null || currentNode == cell)
+                if (cellView == null || currentNode == cellView)
                     continue;
 
-                neighbourList.Add(cell);
+                neighbourList.Add(cellView);
             }
         }
 
         return neighbourList;
     }
 
-    public Cell GetElement(Vector2Int position)
+    public CellView GetElement(Vector2Int position)
     {
         if (position.x < 0 || position.y < 0)
             return null;
@@ -78,23 +77,23 @@ public class GridPN : IGrid
         return _map[position.x,  position.y];
     }
 
-    public Cell GetElement(Vector3 position)
+    public CellView GetElement(Vector3 position)
     {
-        Cell cell = null;
+        CellView cellView = null;
 
         foreach (var element in _map)
             if (element.Position == position)
-                cell = element;
+                cellView = element;
 
-        return cell;
+        return cellView;
     }
 
-    private void SetColorMap(Cell cell, Color color)
+    private void SetColorMap(CellView cellView, Color color)
     {
-        int X = cell.MapPosition.x;
-        int Y = cell.MapPosition.y;
+        int X = cellView.MapPosition.x;
+        int Y = cellView.MapPosition.y;
 
         if ((X % 2 != 0 && Y % 2 == 0) || (X % 2 == 0 && Y % 2 != 0))
-            cell.SetDefaultColor(color);
+            cellView.SetDefaultColor(color);
     }
 }

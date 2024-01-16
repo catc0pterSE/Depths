@@ -11,31 +11,48 @@ public class PathFinding
 
     private List<CellData> _openList;
     private List<CellData> _closedList;
+    
+    private List<CellData> _neignhbours = new List<CellData>(8);
+
+    private Vector3[] _direction = new[]
+    {
+        new Vector3(-1, 0, 0),
+        new Vector3(1, 0, 0),
+        new Vector3(0, 1, 0),
+        new Vector3(0, -1, 0),
+        new Vector3(-1, 1, 0),
+        new Vector3(1, 1, 0),
+        new Vector3(-1, -1, 0),
+        new Vector3(1, -1, 0),
+    };
 
     public PathFinding(IGrid gridPn) =>
         _gridPN = gridPn;
 
-    public List<Cell> FindPath(Vector3 startPosition, Vector3 finishPosition)
+    public List<CellView> FindPath(Vector3 startPosition, Vector3 finishPosition)
     {
         CellData startCell = _gridPN.Cells[_gridPN.GetElement(startPosition)];
         CellData endCell = _gridPN.Cells[_gridPN.GetElement(finishPosition)];
-
+        
         _openList = new List<CellData> { startCell };
         _closedList = new List<CellData>();
 
         SetStatsCell(startCell, 0, endCell);
-
+        
         while (_openList.Count > 0)
         {
             CellData currentCell = GetLowestTotalCostNode(_openList);
-
             if (currentCell == endCell)
                 return CalculatePath(endCell);
 
             _openList.Remove(currentCell);
             _closedList.Add(currentCell);
 
-            foreach (var neighbourCell in currentCell.Neighbours)
+
+            var cell = GetCell(currentCell);
+            _neignhbours = GetNeighbourList(cell.Position);
+            
+            foreach (var neighbourCell in _neignhbours)
             {
                 if (_closedList.Contains(neighbourCell))
                     continue;
@@ -63,7 +80,27 @@ public class PathFinding
         return null;
     }
 
-    private List<Cell> CalculatePath(CellData node)
+    private List<CellData> GetNeighbourList(Vector3 startCell)
+    {
+        _neignhbours.Clear();
+
+        foreach (var dir in _direction)
+        {
+            var cellPosition = startCell + dir;
+            
+            var cell = _gridPN.GetElement(cellPosition);
+            
+            if(cell == null)
+                continue;
+            
+            _neignhbours.Add(_gridPN.Cells[cell]);
+
+        }
+        
+        return _neignhbours;
+    }
+
+    private List<CellView> CalculatePath(CellData node)
     {
         var path = new List<CellData> { node };
 
@@ -100,10 +137,19 @@ public class PathFinding
         nodeStats.CalculateTotalCost();
     }
 
-    private Cell GetCell(CellData cellData) =>
-        _gridPN.Cells.Where(element => element.Value == cellData).Select(element => _gridPN.GetElement(element.Key.MapPosition))
-            .FirstOrDefault();
+    private CellView GetCell(CellData cellData)
+    {
+        foreach (var keyValuePair in _gridPN.Cells)
+        {
+            if (keyValuePair.Value == cellData)
+            {
+                return keyValuePair.Key;
+            }
+        }
+        
+        return null;
+    }
 
-    private List<Cell> ConvertColl(IEnumerable<CellData> path) =>
+    private List<CellView> ConvertColl(IEnumerable<CellData> path) =>
         path.Select(GetCell).ToList();
 }

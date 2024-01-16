@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 
+
+// 1024 cell -> Array -> Cell -> List 8 element -> 1024 500 / 4mb  
 public class CellData
 {
     public CellData ComeFromCell;

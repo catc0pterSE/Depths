@@ -12,7 +12,7 @@ public class LevelPN : MonoBehaviour
 
     private IGrid _grid;
     private PathFinding _pathFinding;
-    private List<Cell> _path;
+    private List<CellView> _path;
 
     private void Awake()
     {
@@ -27,7 +27,7 @@ public class LevelPN : MonoBehaviour
     {
         if (Input.GetMouseButtonUp(0))
         {
-            Cell startNode = _cameraRay.GetNode();
+            CellView startNode = _cameraRay.GetNode();
 
             if (startNode == null)
                 return;
@@ -41,7 +41,7 @@ public class LevelPN : MonoBehaviour
     {
         if (Input.GetMouseButtonDown(0))
         {
-            Cell startNode = _cameraRay.GetNode();
+            CellView startNode = _cameraRay.GetNode();
 
             if (startNode == null)
                 return;
@@ -65,18 +65,18 @@ public class LevelPN : MonoBehaviour
         }
     }
 
-    public List<Cell> FindPath(Vector3 startPosition, Vector3 finishPosition)
+    public List<CellView> FindPath(Vector3 startPosition, Vector3 finishPosition)
     {
         return _pathFinding.FindPath(startPosition, finishPosition);
     }
 
     public void SetNotWalkingNode()
     {
-        Cell cell = _cameraRay.GetNode();
-        _grid.Cells[cell].SetImpassable();
-        SetColorElement(cell, Color.black);
+        CellView cellView = _cameraRay.GetNode();
+        _grid.Cells[cellView].SetImpassable();
+        SetColorElement(cellView, Color.black);
     }
 
-    private void SetColorElement(Cell node, Color color) =>
+    private void SetColorElement(CellView node, Color color) =>
         node.SetColor(color);
 }

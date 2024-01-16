@@ -12,6 +12,8 @@ namespace ECS.Boot
 
         public void Run()
         {
+            if (_unitsPath.IsEmpty()) return;
+            
             foreach (var index in _unitsPath)
             {
                 ref var position = ref _unitsPath.Get2(index).value;

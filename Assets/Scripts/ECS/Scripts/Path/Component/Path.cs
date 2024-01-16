@@ -5,6 +5,6 @@ namespace ECS.Boot
     public struct Path
     {
         public int index;
-        public List<Cell> value;
+        public List<CellView> value;
     }
 }

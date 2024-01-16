@@ -5,13 +5,13 @@ public class PoolPathCell : MonoBehaviour
 {
     private const int StartCount = 5;
         
-    [SerializeField] private Cell _prefab;
+    [SerializeField] private CellView _prefab;
 
-    private PoolMono<Cell> _pool;
+    private PoolMono<CellView> _pool;
 
     private void Awake() => 
-        _pool = new PoolMono<Cell>(_prefab, StartCount, transform, new Factory<Cell>());
+        _pool = new PoolMono<CellView>(_prefab, StartCount, transform, new Factory<CellView>());
 
-    public Cell GetFreeCell() => 
+    public CellView GetFreeCell() => 
         _pool.GetFreeElement();
 }

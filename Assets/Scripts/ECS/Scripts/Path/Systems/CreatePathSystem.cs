@@ -26,7 +26,7 @@ namespace ECS.Boot
 
                 Physics.Raycast(position, Vector3.down, out var hit);
 
-                var cellPosition = hit.collider.GetComponent<Cell>().Position;
+                var cellPosition = hit.collider.GetComponent<CellView>().Position;
                 
                 var findPath = _levelPN.FindPath(cellPosition, cameraRay.GetNode().Position);
                 
