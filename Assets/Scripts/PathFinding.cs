@@ -9,8 +9,8 @@ public class PathFinding
 
     private readonly IGrid _gridPN;
 
-    private List<CellData> _openList;
-    private List<CellData> _closedList;
+    private List<CellData> _openList = new List<CellData>(100);
+    private List<CellData> _closedList = new List<CellData>(100);
     
     private List<CellData> _neignhbours = new List<CellData>(8);
 
@@ -18,12 +18,12 @@ public class PathFinding
     {
         new Vector3(-1, 0, 0),
         new Vector3(1, 0, 0),
-        new Vector3(0, 1, 0),
-        new Vector3(0, -1, 0),
-        new Vector3(-1, 1, 0),
-        new Vector3(1, 1, 0),
-        new Vector3(-1, -1, 0),
-        new Vector3(1, -1, 0),
+        new Vector3(0, 0, -1),
+        new Vector3(0, 0, 1),
+        new Vector3(-1, 0, 1),
+        new Vector3(1, 0, 1),
+        new Vector3(-1, 0, -1),
+        new Vector3(1, 0, -1),
     };
 
     public PathFinding(IGrid gridPn) =>
@@ -33,17 +33,21 @@ public class PathFinding
     {
         CellData startCell = _gridPN.Cells[_gridPN.GetElement(startPosition)];
         CellData endCell = _gridPN.Cells[_gridPN.GetElement(finishPosition)];
-        
-        _openList = new List<CellData> { startCell };
-        _closedList = new List<CellData>();
 
+        _openList.Add(startCell);
+        
         SetStatsCell(startCell, 0, endCell);
         
         while (_openList.Count > 0)
         {
             CellData currentCell = GetLowestTotalCostNode(_openList);
             if (currentCell == endCell)
-                return CalculatePath(endCell);
+            {
+                _openList.Clear();
+                _closedList.Clear();
+                
+                return CalculatePath(endCell);   
+            }
 
             _openList.Remove(currentCell);
             _closedList.Add(currentCell);
@@ -65,18 +69,20 @@ public class PathFinding
 
                 int tentativeTransitionCost =
                     currentCell.TransitionCost + CalculateDistanceCost(currentCell, neighbourCell);
-
+                
                 if (tentativeTransitionCost < neighbourCell.TransitionCost)
                 {
                     neighbourCell.ComeFromCell = currentCell;
                     SetStatsCell(neighbourCell, tentativeTransitionCost, endCell);
-
-                    if (_openList.Contains(neighbourCell) == false)
-                        _openList.Add(neighbourCell);
+                    
+                    _openList.Add(neighbourCell);
                 }
             }
         }
-
+        
+        _openList.Clear();
+        _closedList.Clear();
+        
         return null;
     }
 
@@ -146,6 +152,8 @@ public class PathFinding
                 return keyValuePair.Key;
             }
         }
+        
+        Debug.Log("Null");
         
         return null;
     }
