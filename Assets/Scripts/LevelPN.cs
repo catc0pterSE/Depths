@@ -23,15 +23,6 @@ public class LevelPN : MonoBehaviour
     private void Start() =>
         _grid.Create();
 
-    private void Update()
-    {
-        SetFinishPosition();
-        SetStartPosition();
-        
-        SetNotWalkingNode();
-        FindPath();
-    }
-
     private void SetFinishPosition()
     {
         if (Input.GetMouseButtonUp(0))
@@ -74,14 +65,16 @@ public class LevelPN : MonoBehaviour
         }
     }
 
-    private void SetNotWalkingNode()
+    public List<Cell> FindPath(Vector3 startPosition, Vector3 finishPosition)
     {
-        if (Input.GetMouseButtonDown(1))
-        {
-            Cell cell = _cameraRay.GetNode();
-            _grid.Cells[cell].SetImpassable();
-            SetColorElement(cell, Color.black);
-        }
+        return _pathFinding.FindPath(startPosition, finishPosition);
+    }
+
+    public void SetNotWalkingNode()
+    {
+        Cell cell = _cameraRay.GetNode();
+        _grid.Cells[cell].SetImpassable();
+        SetColorElement(cell, Color.black);
     }
 
     private void SetColorElement(Cell node, Color color) =>

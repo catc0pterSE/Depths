@@ -23,6 +23,6 @@ public class CellData
     public void SetWayToFinalCell(int countCells) =>
         _wayToFinalCell = countCells;
 
-    public void CalculateTotalCost() =>
+    public int CalculateTotalCost() =>
         TotalCost = TransitionCost + _wayToFinalCell;
 }
