@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace ECS.Boot
 {
@@ -6,5 +7,10 @@ namespace ECS.Boot
     {
         public int index;
         public List<CellView> value;
+    }
+
+    public struct TargetPath
+    {
+        public Vector3 value;
     }
 }

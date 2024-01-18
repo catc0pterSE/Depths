@@ -1,7 +1,8 @@
-using System;
 using System.Collections;
+using ECS.Scripts.Work;
 using Leopotam.Ecs;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace ECS.Boot
 {
@@ -9,11 +10,13 @@ namespace ECS.Boot
     {
 	    private EcsWorld _world;
 	    private EcsSystems _systems;
-        
+	    
         [SerializeField] private SceneData _sceneData;
 		[SerializeField] private RuntimeData _runtimeData;
 		[SerializeField] private StaticData _staticData;
 		[SerializeField] private LevelPN _levelPn;
+		
+		[SerializeField] private UnitWindow _window;
 
         IEnumerator Start()
         {
@@ -22,22 +25,40 @@ namespace ECS.Boot
             _world = new EcsWorld();
             _systems = new EcsSystems(_world);
 
-            _runtimeData = new RuntimeData();
             
+            _runtimeData = new RuntimeData();
+
+
+            ISelectionService selectionService = new SelectionService();
+            UnitPresenter presenter = new UnitPresenter(selectionService, _window);
             _systems
 		            
 	            .Add(new SpawnUnitSystem())
-	            .Add(new CreatePathSystem())
 	            .Add(new SetNotWalkingSystem())
+	            
+	            .Add(new CreateMousePathSystem())
+	            .Add(new CreateRandPathSystem())
+	            
+	            .Add(new CreatePathSystem())
+	            
+	            .Add(new WorkSystem())
+	            
+	            .Add(new FindItemProcessSystem())
+	            
+	            .Add(new WorkCancelSystem())
+	            
+	            
 	            .Add(new PathMoveSystem())
 	            .Add(new UpdatePositionSystem())
 	            
 	            .Inject(_sceneData)
 	            .Inject(_runtimeData)
 	            .Inject(_staticData)
+	            .Inject(selectionService)
 	            .Inject(_levelPn)
 
 	            .Init();
+
 
             yield return null;
         }

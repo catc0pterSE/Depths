@@ -9,7 +9,9 @@ namespace ECS.Boot
         private readonly RuntimeData _runtimeData;
         private readonly StaticData _staticData;
 
-        private readonly EcsFilter<Unit, Position, Path> _unitsPath;
+        private readonly EcsFilter<Position, Path> _unitsPath;
+        
+        private readonly EcsFilter<Position, Direction, Stats> _unitsMoveDirection;
 
         public void Run()
         {
@@ -17,8 +19,11 @@ namespace ECS.Boot
             
             foreach (var index in _unitsPath)
             {
-                ref var position = ref _unitsPath.Get2(index).value;
-                ref var points = ref _unitsPath.Get3(index);
+                ref var position = ref _unitsPath.Get1(index).value;
+                
+                ref var points = ref _unitsPath.Get2(index);
+                
+                ref var entity = ref _unitsPath.GetEntity(index);
                 
                 var cellView = points.value[points.index];
                 
@@ -31,13 +36,27 @@ namespace ECS.Boot
 
                     if (points.index >= points.value.Count)
                     {
-                        var entity = _unitsPath.GetEntity(index);
+                        entity.Del<Direction>();
                         entity.Del<Path>();
+                        
+                        continue;
                     }
                 }
+
+                entity.Get<Direction>().value = dir.normalized;
+            }
+
+            foreach (var index in _unitsMoveDirection)
+            {
+                ref var position = ref _unitsMoveDirection.Get1(index).value;
+                ref var direction = ref _unitsMoveDirection.Get2(index).value;
+                var speed = _unitsMoveDirection.Get3(index).value[StatType.Speed].Get<Stat>().TotalValue();
                 
-                position += dir.normalized * (_runtimeData.deltaTime * 5f);
+                position += direction * (speed * _runtimeData.deltaTime);
+                
             }
         }
+        
+       
     }
 }

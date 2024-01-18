@@ -1,16 +1,71 @@
+using System.Collections.Generic;
 using Leopotam.Ecs;
 using UnityEngine;
 
 namespace ECS.Boot
 {
-    // leo -> ищет все структуры Pool<T> generate array
-    // : 1000   entity -> iD  _filter -> ID -> Pool<T>(ID) -> COMPONENT
+    public sealed class CreateRandPathSystem : IEcsRunSystem
+    {
+        private readonly EcsFilter<Position, RandMove>.Exclude<Path> _units;
+        private RuntimeData _runtimeData;
+
+        public void Run()
+        {
+            foreach (var index in _units)
+            {
+                var entity = _units.GetEntity(index);
+                ref var position = ref _units.Get1(index).value;
+                ref var randMove = ref _units.Get2(index);
+
+                randMove.time -= _runtimeData.deltaTime;
+                
+                if (randMove.time <= 0)
+                {
+                    randMove.time = Random.Range(1f, 2f);
+
+                    var randDirection = new Vector3(Random.Range(-1f, 1f), 0, Random.Range(-1f, 1f));
+       
+                    entity.Get<TargetPath>().value = position + randDirection;
+                }
+            }
+        }
+    }
+    
     public sealed class CreatePathSystem : IEcsRunSystem
     {
-        private readonly EcsFilter<Unit, Position, Selected> _units;
+        private readonly EcsFilter<Position, TargetPath>.Exclude<Path> _units;
 		
         private readonly LevelPN _levelPN;
 
+        public void Run()
+        {
+            foreach (var unitIndex in _units)
+            {
+                ref var entity = ref _units.GetEntity(unitIndex);
+				
+                ref readonly var position = ref _units.Get1(unitIndex).value;
+                ref readonly var targetPosition = ref _units.Get2(unitIndex).value;
+
+                Physics.Raycast(position, Vector3.down, out var hitUnit);
+                Physics.Raycast(targetPosition, Vector3.down, out var hitTarget);
+
+                var cellUnit = hitUnit.collider.GetComponent<CellView>().Position;
+                var cellTarget = hitTarget.collider.GetComponent<CellView>().Position;
+                
+                var findPath = _levelPN.FindPath(cellUnit, cellTarget);
+                
+                ref var path = ref entity.Get<Path>();
+                path.value = findPath;
+                path.index = 0;
+                
+                entity.Del<TargetPath>();
+            }
+        }
+    }
+    
+    public sealed class CreateMousePathSystem : IEcsRunSystem
+    {
+        private readonly EcsFilter<Unit, Position, Selected> _units;
         public void Run()
         {
             if (!Input.GetMouseButtonDown(1))
@@ -23,18 +78,7 @@ namespace ECS.Boot
             foreach (var unitIndex in _units)
             {
                 ref var entity = ref _units.GetEntity(unitIndex);
-				
-                ref readonly var position = ref _units.Get2(unitIndex).value;
-
-                Physics.Raycast(position, Vector3.down, out var hit);
-
-                var cellPosition = hit.collider.GetComponent<CellView>().Position;
-                
-                var findPath = _levelPN.FindPath(cellPosition, cameraRay.GetNode().Position);
-                
-                ref var path = ref entity.Get<Path>();
-                path.value = findPath;
-                path.index = 0;
+                entity.Get<TargetPath>().value = cameraRay.GetNode().Position;
             }
         }
     }

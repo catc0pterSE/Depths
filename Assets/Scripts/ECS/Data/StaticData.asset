@@ -13,3 +13,13 @@ MonoBehaviour:
   m_Name: StaticData
   m_EditorClassIdentifier: 
   <UnitPrefab>k__BackingField: {fileID: 7544366745610281271, guid: 65a83a25562649040a2aaf8c4f524c6d, type: 3}
+  <BodyPartsData>k__BackingField:
+  - {fileID: 11400000, guid: 7c78fbdf0438d1543b1a891e16425e71, type: 2}
+  - {fileID: 11400000, guid: dfc3bc53059498a4993bbc91e26c57a6, type: 2}
+  - {fileID: 11400000, guid: 664f32147c75b004893f3bf3e2f8d620, type: 2}
+  - {fileID: 11400000, guid: 4fbbd41d4f8a8b442b65e3bd4534fc3e, type: 2}
+  - {fileID: 11400000, guid: 552316969198cac4faea655e12a6df6f, type: 2}
+  <StatsData>k__BackingField:
+  - {fileID: 11400000, guid: e2ba04dff23d8144c976700c404f8ef0, type: 2}
+  - {fileID: 11400000, guid: 76598b4ba32b8584eb12c923c11d239b, type: 2}
+  - {fileID: 11400000, guid: 212829899199e0c439fae1129cdfc760, type: 2}
