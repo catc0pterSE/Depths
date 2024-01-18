@@ -1,4 +1,4 @@
-namespace ECS.Boot
+namespace ECS.Scripts.TestSystem
 {
     public struct Part
     {

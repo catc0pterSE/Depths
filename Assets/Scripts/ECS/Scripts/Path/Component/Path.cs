@@ -1,16 +1,10 @@
 using System.Collections.Generic;
-using UnityEngine;
 
-namespace ECS.Boot
+namespace ECS.Scripts.Path.Component
 {
     public struct Path
     {
         public int index;
         public List<CellView> value;
-    }
-
-    public struct TargetPath
-    {
-        public Vector3 value;
     }
 }

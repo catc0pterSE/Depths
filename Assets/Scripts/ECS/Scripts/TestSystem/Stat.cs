@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace ECS.Boot
+namespace ECS.Scripts.TestSystem
 {
     public struct Stat
     {

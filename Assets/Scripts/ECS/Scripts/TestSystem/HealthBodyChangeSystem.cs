@@ -1,7 +1,7 @@
 using Leopotam.Ecs;
 using UnityEngine;
 
-namespace ECS.Boot
+namespace ECS.Scripts.TestSystem
 {
     public sealed class HealthBodyChangeSystem : IEcsRunSystem
     {

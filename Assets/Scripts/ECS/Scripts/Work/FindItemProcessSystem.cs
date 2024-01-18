@@ -1,4 +1,8 @@
-using ECS.Boot;
+using ECS.Scripts.Data;
+using ECS.Scripts.GeneralComponents;
+using ECS.Scripts.Path.Component;
+using ECS.Scripts.ProviderComponents;
+using ECS.Scripts.TestSystem;
 using Leopotam.Ecs;
 using UnityEngine;
 

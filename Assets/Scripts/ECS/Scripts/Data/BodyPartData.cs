@@ -1,6 +1,7 @@
+using ECS.Scripts.TestSystem;
 using UnityEngine;
 
-namespace ECS.Boot
+namespace ECS.Scripts.Data
 {
     [CreateAssetMenu(menuName = "Create BodyPart", fileName = "BodyPart", order = 0)]
     public sealed class BodyPartData : ScriptableObject

@@ -1,4 +1,4 @@
-using ECS.Boot;
+using ECS.Scripts.Data;
 using Leopotam.Ecs;
 
 namespace ECS.Scripts.Work

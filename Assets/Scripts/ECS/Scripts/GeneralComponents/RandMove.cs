@@ -1,6 +1,7 @@
 namespace ECS.Scripts.GeneralComponents
 {
-    public struct Selected
+    public struct RandMove
     {
+        public float time;
     }
 }

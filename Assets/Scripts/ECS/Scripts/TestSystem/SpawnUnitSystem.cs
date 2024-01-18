@@ -1,12 +1,16 @@
-using System;
 using System.Collections.Generic;
+using ECS.Scripts.Boot;
+using ECS.Scripts.CharacterComponent;
+using ECS.Scripts.Data;
+using ECS.Scripts.GeneralComponents;
+using ECS.Scripts.ProviderComponents;
 using ECS.Scripts.Work;
 using Leopotam.Ecs;
 using UnityEngine;
 using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
-namespace ECS.Boot
+namespace ECS.Scripts.TestSystem
 {
     public sealed class SpawnUnitSystem : IEcsRunSystem
     {
@@ -39,12 +43,12 @@ namespace ECS.Boot
 
             CreateStats(entityUnit);
             
-            var findWork = new Work();
+            var findWork = new Work.Work();
             findWork.Order = 0;
             findWork.value = new FindItemWork(_items);
                 
             
-            entityUnit.Get<Works>().value = new Work[]
+            entityUnit.Get<Works>().value = new Work.Work[]
             {
                 findWork
             };

@@ -1,7 +1,9 @@
+using ECS.Scripts.Data;
+using ECS.Scripts.GeneralComponents;
+using ECS.Scripts.TestSystem;
 using Leopotam.Ecs;
-using UnityEngine;
 
-namespace ECS.Boot
+namespace ECS.Scripts.Path.Systems
 {
     public sealed class PathMoveSystem : IEcsRunSystem
     {
@@ -9,7 +11,7 @@ namespace ECS.Boot
         private readonly RuntimeData _runtimeData;
         private readonly StaticData _staticData;
 
-        private readonly EcsFilter<Position, Path> _unitsPath;
+        private readonly EcsFilter<Position, Component.Path> _unitsPath;
         
         private readonly EcsFilter<Position, Direction, Stats> _unitsMoveDirection;
 
@@ -37,7 +39,7 @@ namespace ECS.Boot
                     if (points.index >= points.value.Count)
                     {
                         entity.Del<Direction>();
-                        entity.Del<Path>();
+                        entity.Del<Component.Path>();
                         
                         continue;
                     }

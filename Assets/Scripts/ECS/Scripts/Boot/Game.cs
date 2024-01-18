@@ -1,10 +1,13 @@
 using System.Collections;
+using ECS.Scripts.Data;
+using ECS.Scripts.Path.Systems;
+using ECS.Scripts.SyncSystems;
+using ECS.Scripts.TestSystem;
 using ECS.Scripts.Work;
 using Leopotam.Ecs;
 using UnityEngine;
-using UnityEngine.Serialization;
 
-namespace ECS.Boot
+namespace ECS.Scripts.Boot
 {
 	public sealed class Game : MonoBehaviour
     {

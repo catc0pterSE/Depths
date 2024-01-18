@@ -1,7 +1,7 @@
 using Leopotam.Ecs;
 using UnityEngine;
 
-namespace ECS.Boot
+namespace ECS.Scripts.Path.Systems
 {
     public sealed class SetNotWalkingSystem : IEcsRunSystem
     {

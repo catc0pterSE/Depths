@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Leopotam.Ecs;
 
-namespace ECS.Boot
+namespace ECS.Scripts.TestSystem
 {
     public struct Stats
     {

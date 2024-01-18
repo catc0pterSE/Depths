@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ECS.Boot
+namespace ECS.Scripts.ProviderComponents
 {
     public struct TransformRef
     {

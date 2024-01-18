@@ -1,6 +1,6 @@
 using Leopotam.Ecs;
 
-namespace ECS.Boot
+namespace ECS.Scripts.TestSystem
 {
     public struct Owner
     {

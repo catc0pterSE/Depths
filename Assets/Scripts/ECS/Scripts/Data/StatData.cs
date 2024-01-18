@@ -1,6 +1,7 @@
+using ECS.Scripts.TestSystem;
 using UnityEngine;
 
-namespace ECS.Boot
+namespace ECS.Scripts.Data
 {
     [CreateAssetMenu(menuName = "Create Stat", fileName = "StatData", order = 0)]
     public sealed class StatData : ScriptableObject

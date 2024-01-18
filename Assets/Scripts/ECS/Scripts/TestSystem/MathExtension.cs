@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ECS.Boot
+namespace ECS.Scripts.TestSystem
 {
     public static class MathExtension
     {

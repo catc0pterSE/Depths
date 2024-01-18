@@ -1,12 +1,15 @@
-using System.Collections.Generic;
+using ECS.Scripts.CharacterComponent;
+using ECS.Scripts.Data;
+using ECS.Scripts.GeneralComponents;
+using ECS.Scripts.Path.Component;
 using Leopotam.Ecs;
 using UnityEngine;
 
-namespace ECS.Boot
+namespace ECS.Scripts.Path.Systems
 {
     public sealed class CreateRandPathSystem : IEcsRunSystem
     {
-        private readonly EcsFilter<Position, RandMove>.Exclude<Path> _units;
+        private readonly EcsFilter<Position, RandMove>.Exclude<Component.Path> _units;
         private RuntimeData _runtimeData;
 
         public void Run()
@@ -33,7 +36,7 @@ namespace ECS.Boot
     
     public sealed class CreatePathSystem : IEcsRunSystem
     {
-        private readonly EcsFilter<Position, TargetPath>.Exclude<Path> _units;
+        private readonly EcsFilter<Position, TargetPath>.Exclude<Component.Path> _units;
 		
         private readonly LevelPN _levelPN;
 
@@ -54,7 +57,7 @@ namespace ECS.Boot
                 
                 var findPath = _levelPN.FindPath(cellUnit, cellTarget);
                 
-                ref var path = ref entity.Get<Path>();
+                ref var path = ref entity.Get<Component.Path>();
                 path.value = findPath;
                 path.index = 0;
                 

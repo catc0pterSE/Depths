@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace ECS.Boot
+namespace ECS.Scripts.Data
 {
     [CreateAssetMenu(menuName = "Create StaticData", fileName = "StaticData", order = 0)]
     public sealed class StaticData : ScriptableObject

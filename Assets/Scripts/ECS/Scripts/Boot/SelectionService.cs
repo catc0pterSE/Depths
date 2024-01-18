@@ -1,7 +1,7 @@
 using System;
 using Leopotam.Ecs;
 
-namespace ECS.Boot
+namespace ECS.Scripts.Boot
 {
     public sealed class SelectionService : ISelectionService
     {
