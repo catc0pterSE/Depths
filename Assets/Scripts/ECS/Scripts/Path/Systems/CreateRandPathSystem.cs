@@ -10,7 +10,7 @@ namespace ECS.Scripts.Path.Systems
 {
     public sealed class CreateRandPathSystem : IEcsRunSystem
     {
-        private readonly EcsFilter<Position, RandMove>.Exclude<Component.Path, WorkProcess> _units;
+        private readonly EcsFilter<Position, RandMove>.Exclude<Components.Path, WorkProcess> _units;
         private RuntimeData _runtimeData;
 
         private LevelPN _levelPn;

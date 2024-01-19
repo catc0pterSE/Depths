@@ -18,7 +18,7 @@ namespace ECS.Scripts.Path.Systems
         private readonly RuntimeData _runtimeData;
         private readonly StaticData _staticData;
 
-        private readonly EcsFilter<Position, Component.Path> _unitsPath;
+        private readonly EcsFilter<Position, Components.Path> _unitsPath;
         
         private readonly EcsFilter<Position, Direction, Speed> _unitsMoveDirection;
         
@@ -75,7 +75,7 @@ namespace ECS.Scripts.Path.Systems
                     if (points.index >= points.value.Count)
                     {
                         entity.Del<Direction>();
-                        entity.Del<Component.Path>();
+                        entity.Del<Components.Path>();
                         
                         continue;
                     }
@@ -97,7 +97,7 @@ namespace ECS.Scripts.Path.Systems
                 MoveData.direction = _unitsMoveDirection.Get2(i).value;
                 MoveData.speed = _unitsMoveDirection.Get3(i).value;
 
-                Debug.Log($"{MoveData.position} {MoveData.direction} {MoveData.speed}");
+                // Debug.Log($"{MoveData.position} {MoveData.direction} {MoveData.speed}");
                 positionNative[i] = MoveData;
             }
 

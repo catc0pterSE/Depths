@@ -28,23 +28,25 @@ namespace ECS.Scripts.TestSystem
             {
                 return;
             }
-            
-            
-            var cameraRay = Object.FindFirstObjectByType<CameraController>();
-            
-            var instanceObject = Object.Instantiate(_staticData.MinePrefab);
-            
-            var entityUnit = _world.NewEntity();
-            
-            entityUnit.Get<MiningTag>();
-            entityUnit.Get<Health>().value = 5f;
-            entityUnit.Get<TransformRef>().value = instanceObject.transform;
+            int count = 100;
 
-            var pos = cameraRay.GetWorldPosition();
-            pos.z = 0;
-            pos.x = MathF.Round(pos.x);
-            pos.y = MathF.Round(pos.y);
-            entityUnit.Get<Position>().value = pos;
+            while (count > 0)
+            {
+                var instanceObject = Object.Instantiate(_staticData.MinePrefab);
+
+                var entityUnit = _world.NewEntity();
+
+                entityUnit.Get<MiningTag>();
+                entityUnit.Get<Health>().value = 5f;
+                entityUnit.Get<TransformRef>().value = instanceObject.transform;
+
+                var pos =  new Vector3(Random.Range(0f, 50f), Random.Range(0f, 50f));;
+                pos.x = MathF.Round(pos.x);
+                pos.y = MathF.Round(pos.y);
+                entityUnit.Get<Position>().value = pos;
+
+                count--;
+            }
         }
 
         
@@ -69,7 +71,7 @@ namespace ECS.Scripts.TestSystem
                 return;
             }
 
-            int count = 5;
+            int count = 100;
 
             while (count > 0)
             {
