@@ -1,6 +1,6 @@
 using ECS.Scripts.GeneralComponents;
 using ECS.Scripts.ProviderComponents;
-using ECS.Scripts.Work;
+using ECS.Scripts.WorkFeature;
 using Leopotam.Ecs;
 
 namespace ECS.Scripts.SyncSystems

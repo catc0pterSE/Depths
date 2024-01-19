@@ -1,6 +1,6 @@
 using Leopotam.Ecs;
 
-namespace ECS.Scripts.Work
+namespace ECS.Scripts.WorkFeature
 {
     public struct FindItemProcess
     {

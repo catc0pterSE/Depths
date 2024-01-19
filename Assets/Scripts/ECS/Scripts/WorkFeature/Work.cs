@@ -1,4 +1,4 @@
-namespace ECS.Scripts.Work
+namespace ECS.Scripts.WorkFeature
 {
     public struct Work
     {
