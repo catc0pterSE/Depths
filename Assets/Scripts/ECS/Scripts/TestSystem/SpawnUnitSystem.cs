@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using ECS.Scripts.Boot;
 using ECS.Scripts.CharacterComponent;
 using ECS.Scripts.Data;
@@ -120,10 +121,12 @@ namespace ECS.Scripts.TestSystem
             }
         }
 
+        
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void CreateBody(EcsEntity entityUnit)
         {
             ref var body = ref entityUnit.Get<Body>();
-            
+
             body.parts = new Dictionary<BodyPart, EcsEntity>();
             foreach (var bodyPartData in _staticData.BodyPartsData)
             {

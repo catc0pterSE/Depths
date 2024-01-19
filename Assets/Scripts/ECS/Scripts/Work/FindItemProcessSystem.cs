@@ -52,8 +52,6 @@ namespace ECS.Scripts.Work
                 
                 if (dist < 0.1f)
                 {
-                    Debug.Log("Get Item");
-                    
                     ref var entity = ref _filter.GetEntity(index);
 
                     entity.Get<ItemInHand>().value = component.ItemEntity;

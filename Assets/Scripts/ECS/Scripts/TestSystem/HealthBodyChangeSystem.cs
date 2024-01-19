@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ECS.Scripts.TestSystem
 {
-    public sealed class HealthBodyChangeSystem : IEcsRunSystem
+    public sealed class BodyStateReactionSystem : IEcsRunSystem
     {
         private readonly EcsFilter<Head, Health, OnChangeHealth> _head;
         private readonly EcsFilter<Part, Health, OnChangeHealth> _parts;
@@ -24,7 +24,6 @@ namespace ECS.Scripts.TestSystem
             {
                 ref var part = ref _parts.Get1(i).value;
                 ref var health = ref _parts.Get2(i).value;
-                
                 Debug.Log($"{part.ToString()} : {health}");
             }
         }

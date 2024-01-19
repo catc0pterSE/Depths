@@ -89,7 +89,7 @@ namespace PathFindingSystem
             {
                 for (int y = target.GridPosition.y - 1; y <= target.GridPosition.y + 1; y++)
                 {
-                    CellPFModel currentCell = _gridPN.GetCell(new Vector2Int(x, y));
+                    _gridPN.TryGetCell(new Vector2Int(x, y), out var currentCell);
                 
                     if(currentCell == null)
                         continue;

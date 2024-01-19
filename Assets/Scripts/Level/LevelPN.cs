@@ -118,11 +118,9 @@ namespace Level
             _tilemap.SetTile(node.GridPosition.ToVector3(), _tileBase2);
         }
 
-        public bool ExitBounds(Vector3 position)
+        public bool OutBounds(Vector3 position)
         {
-            Vector2Int worldPosition = new Vector2Int(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
-            
-            return !_grid.TryGetCell(worldPosition, out _);
+            return _grid.OutBounds(position);
         }
     }
 }

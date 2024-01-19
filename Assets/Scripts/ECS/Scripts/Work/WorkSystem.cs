@@ -1,18 +1,39 @@
+using System;
+using System.Collections.Generic;
 using ECS.Scripts.Data;
+using ECS.Scripts.GeneralComponents;
+using ECS.Scripts.TestSystem;
 using Leopotam.Ecs;
+using Unity.VisualScripting;
 
 namespace ECS.Scripts.Work
 {
     
     
-    public sealed class WorkSystem : IEcsRunSystem
+    public sealed class WorkSystem : IEcsInitSystem, IEcsRunSystem
     {
         private readonly SceneData _sceneData;
         private readonly RuntimeData _runtimeData;
         private readonly StaticData _staticData;
 
         private readonly EcsFilter<Works>.Exclude<WorkProcess> _filter;
+        private readonly EcsFilter<Item, Position>.Exclude<ItemPlaced> _items;
+        
+        
+        private Dictionary<WorkType, Func<bool>> _conditions;
+        
+        public enum WorkType
+        {
+            FindItem,
+        }
 
+        public void Init()
+        {
+            _conditions = new Dictionary<WorkType, Func<bool>>()
+            {
+                [WorkType.FindItem] = () => !_items.IsEmpty(),
+            };
+        }
         public void Run()
         {
             foreach (var index in _filter)
@@ -33,5 +54,6 @@ namespace ECS.Scripts.Work
                 }
             }
         }
+        
     }
 }
