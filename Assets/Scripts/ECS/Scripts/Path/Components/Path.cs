@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using Grid.Elements;
 
-namespace ECS.Scripts.Path.Component
+namespace ECS.Scripts.Path.Components
 {
     public struct Path
     {
