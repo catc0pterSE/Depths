@@ -35,12 +35,7 @@ namespace PathFindingSystem
 
                 if (currentCellView == endCellPf)
                 {
-                    var cellPath = CalculatePath(endCellPf);
-                
-                    ResettingIndicators(_openList);
-                    ResettingIndicators(_closedList);
-
-                    return cellPath;
+                    break;
                 }
 
                 _openList.Remove(currentCellView);
@@ -70,8 +65,14 @@ namespace PathFindingSystem
                     }
                 }
             }
+            
+            
+            var cellPath = CalculatePath(endCellPf);
+                
+            ResettingIndicators(_openList);
+            ResettingIndicators(_closedList);
 
-            return null;
+            return cellPath;
         }
 
         private void ResettingIndicators(List<CellPFModel> list)
@@ -88,7 +89,7 @@ namespace PathFindingSystem
             {
                 for (int y = target.GridPosition.y - 1; y <= target.GridPosition.y + 1; y++)
                 {
-                    CellPFModel currentCell = _gridPN.FromWorldToCell(new Vector2Int(x, y));
+                    CellPFModel currentCell = _gridPN.GetCell(new Vector2Int(x, y));
                 
                     if(currentCell == null)
                         continue;

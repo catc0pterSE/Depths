@@ -5,6 +5,7 @@ using ECS.Scripts.SyncSystems;
 using ECS.Scripts.TestSystem;
 using ECS.Scripts.Work;
 using Leopotam.Ecs;
+using Level;
 using UnityEngine;
 
 namespace ECS.Scripts.Boot
@@ -36,19 +37,26 @@ namespace ECS.Scripts.Boot
             UnitPresenter presenter = new UnitPresenter(selectionService, _window);
             _systems
 		            
+	            .Add(new SpawnItemSystem())
 	            .Add(new SpawnUnitSystem())
 	            .Add(new SetNotWalkingSystem())
 	            
 	            .Add(new CreateMousePathSystem())
 	            .Add(new CreateRandPathSystem())
 	            
-	            .Add(new CreatePathSystem())
 	            
+	            // start work
+                
 	            .Add(new WorkSystem())
 	            
 	            .Add(new FindItemProcessSystem())
 	            
 	            .Add(new WorkCancelSystem())
+	            
+	            // end work
+                
+	            
+	            .Add(new CreatePathSystem())
 	            
 	            
 	            .Add(new PathMoveSystem())

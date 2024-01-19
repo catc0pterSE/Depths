@@ -43,14 +43,7 @@ namespace Level
                 }
             }
         }
-
-        private void Update()
-        {
-            SetPosition();
-            SetNotWalkingNode();
-
-            ResetElement();
-        }
+        
 
         private void SetPosition()
         {
@@ -85,18 +78,17 @@ namespace Level
         }
 
 
-        private void FindPath(Vector3 startPosition, Vector3 finishPosition)
+        public List<CellPFModel> FindPath(Vector3 startPosition, Vector3 finishPosition)
         {
             _path = _pathFinding.FindPath(startPosition, finishPosition);
+            
+            // for (int i = 1; i < _path.Count - 1; i++)
+            //     SetColorElement(_path[i]);
 
-            if (_path == null)
-                return;
-
-            for (int i = 1; i < _path.Count - 1; i++)
-                SetColorElement(_path[i]);
+            return _path;
         }
 
-        private void SetNotWalkingNode()
+        public void SetNotWalkingNode()
         {
             if (Input.GetMouseButtonDown(1))
             {
@@ -124,6 +116,13 @@ namespace Level
         {
             _tilemap.GetTile(node.GridPosition.ToVector3());
             _tilemap.SetTile(node.GridPosition.ToVector3(), _tileBase2);
+        }
+
+        public bool ExitBounds(Vector3 position)
+        {
+            Vector2Int worldPosition = new Vector2Int(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
+            
+            return !_grid.TryGetCell(worldPosition, out _);
         }
     }
 }

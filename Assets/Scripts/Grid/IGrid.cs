@@ -7,7 +7,7 @@ namespace Grid
     {
         public CellPFModel[,] Map { get; }
         public void Create();
-        public CellPFModel FromWorldToCell(Vector2Int position);
+        public CellPFModel GetCell(Vector2Int position);
         public CellPFModel FromWorldToCell(Vector3 position);
         public bool TryGetCell(Vector2Int position, out CellPFModel cell);
     }

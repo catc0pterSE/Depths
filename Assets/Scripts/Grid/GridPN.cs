@@ -28,15 +28,28 @@ namespace Grid
             }
         }
 
-        public CellPFModel FromWorldToCell(Vector2Int position) =>
+        public CellPFModel GetCell(Vector2Int position) =>
             Map[position.x, position.y];
 
         public CellPFModel FromWorldToCell(Vector3 position)
         {
-            Vector2Int worldPosition = new Vector2Int(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
-            return FromWorldToCell(worldPosition);
+            var positionInt = new Vector2Int(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
+            
+            return GetCell(positionInt);
         }
 
+        
+        public bool TryGetCell(Vector3 position, out CellPFModel cell)
+        {
+            var positionInt = new Vector2Int(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
+
+            if (TryGetCell(positionInt, out cell))
+            {
+                return true;
+            }
+            
+            return false;
+        }
         public bool TryGetCell(Vector2Int position, out CellPFModel cell)
         {
             cell = null;
@@ -47,7 +60,7 @@ namespace Grid
             if (position.x > Map.GetLength(0) - 1 || position.y > Map.GetLength(1) - 1)
                 return false;
 
-            cell = FromWorldToCell(position);
+            cell = GetCell(position);
             return true;
         }
     }
