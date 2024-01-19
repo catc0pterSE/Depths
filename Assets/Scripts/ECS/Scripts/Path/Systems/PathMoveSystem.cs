@@ -2,11 +2,13 @@ using System.Threading.Tasks;
 using ECS.Scripts.Data;
 using ECS.Scripts.GeneralComponents;
 using ECS.Scripts.TestSystem;
+using ECS.Scripts.WorkFeature;
 using Leopotam.Ecs;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace ECS.Scripts.Path.Systems
 {
@@ -18,7 +20,7 @@ namespace ECS.Scripts.Path.Systems
 
         private readonly EcsFilter<Position, Component.Path> _unitsPath;
         
-        private readonly EcsFilter<Position, Direction, Stats> _unitsMoveDirection;
+        private readonly EcsFilter<Position, Direction, Speed> _unitsMoveDirection;
         
         
         [BurstCompile]
@@ -93,8 +95,9 @@ namespace ECS.Scripts.Path.Systems
                 var MoveData = new MoveData();
                 MoveData.position = _unitsMoveDirection.Get1(i).value;
                 MoveData.direction = _unitsMoveDirection.Get2(i).value;
-                MoveData.speed = _unitsMoveDirection.Get3(i).value[StatType.Speed].Get<Stat>().TotalValue();
+                MoveData.speed = _unitsMoveDirection.Get3(i).value;
 
+                Debug.Log($"{MoveData.position} {MoveData.direction} {MoveData.speed}");
                 positionNative[i] = MoveData;
             }
 

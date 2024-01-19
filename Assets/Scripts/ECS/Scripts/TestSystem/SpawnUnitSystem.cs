@@ -6,7 +6,7 @@ using ECS.Scripts.CharacterComponent;
 using ECS.Scripts.Data;
 using ECS.Scripts.GeneralComponents;
 using ECS.Scripts.ProviderComponents;
-using ECS.Scripts.Work;
+using ECS.Scripts.WorkFeature;
 using Leopotam.Ecs;
 using Level;
 using UnityEngine;
@@ -32,11 +32,12 @@ namespace ECS.Scripts.TestSystem
             
             var cameraRay = Object.FindFirstObjectByType<CameraController>();
             
-            var instanceObject = Object.Instantiate(_staticData.ItemPrefab);
+            var instanceObject = Object.Instantiate(_staticData.MinePrefab);
             
             var entityUnit = _world.NewEntity();
             
-            entityUnit.Get<Item>();
+            entityUnit.Get<MiningTag>();
+            entityUnit.Get<Health>().value = 5f;
             entityUnit.Get<TransformRef>().value = instanceObject.transform;
 
             var pos = cameraRay.GetWorldPosition();
@@ -48,7 +49,7 @@ namespace ECS.Scripts.TestSystem
 
         
     }
-    public sealed class SpawnUnitSystem : IEcsRunSystem
+    public sealed class SpawnUnitSystem : IEcsRunSystem, IEcsInitSystem
     {
         private readonly EcsWorld _world;
 		
@@ -57,7 +58,10 @@ namespace ECS.Scripts.TestSystem
         private readonly ISelectionService _selectionService;
         
         private readonly EcsFilter<Item, Position>.Exclude<ItemPlaced> _items;
-        
+        private readonly EcsFilter<MiningTag, Position>.Exclude<ItemPlaced> _mining;
+        private FindItemWork _findItemWork;
+        private FindMineWork _findMineWork;
+
         public void Run()
         {
             if (!Input.GetKeyDown(KeyCode.Space))
@@ -65,7 +69,7 @@ namespace ECS.Scripts.TestSystem
                 return;
             }
 
-            int count = 100;
+            int count = 5;
 
             while (count > 0)
             {
@@ -91,13 +95,19 @@ namespace ECS.Scripts.TestSystem
 
                 CreateStats(entityUnit);
 
-                var findWork = new Work.Work();
+                var findWork = new Work();
                 findWork.Order = 0;
-                findWork.value = new FindItemWork(_items);
+                findWork.value = _findItemWork;
 
+                
+                var findMine = new Work();
+                findMine.Order = 0;
+                findMine.value = _findMineWork;
+                
 
-                entityUnit.Get<Works>().value = new Work.Work[]
+                entityUnit.Get<Works>().value = new Work[]
                 {
+                    findMine,
                     findWork
                 };
 
@@ -117,6 +127,14 @@ namespace ECS.Scripts.TestSystem
                 var statEntity = _world.NewEntity();
                 statEntity.Get<Stat>().type = statData.Stat;
                 statEntity.Get<Stat>().value = 10f;
+
+
+                if (statData.Stat == StatType.Speed)
+                {
+                    entityUnit.Get<Speed>().value = 10f;
+                }
+                
+                
                 stats.value.Add(statData.Stat, statEntity);
             }
         }
@@ -144,6 +162,12 @@ namespace ECS.Scripts.TestSystem
                 
                 body.parts.Add(bodyPartData.Part, partEntity);
             }
+        }
+
+        public void Init()
+        {
+            _findItemWork = new FindItemWork(_items);
+            _findMineWork = new FindMineWork(_mining);
         }
     }
 }

@@ -3,7 +3,7 @@ using ECS.Scripts.Data;
 using ECS.Scripts.Path.Systems;
 using ECS.Scripts.SyncSystems;
 using ECS.Scripts.TestSystem;
-using ECS.Scripts.Work;
+using ECS.Scripts.WorkFeature;
 using Leopotam.Ecs;
 using Level;
 using UnityEngine;
@@ -50,6 +50,7 @@ namespace ECS.Scripts.Boot
 	            .Add(new WorkSystem())
 	            
 	            .Add(new FindItemProcessSystem())
+	            .Add(new MineProcessSystem())
 	            
 	            .Add(new WorkCancelSystem())
 	            
@@ -57,6 +58,10 @@ namespace ECS.Scripts.Boot
                 
 	            
 	            .Add(new CreatePathSystem())
+	            
+	            
+	            // Dieds
+	            .Add(new MineDiedSystem())
 	            
 	            
 	            .Add(new PathMoveSystem())

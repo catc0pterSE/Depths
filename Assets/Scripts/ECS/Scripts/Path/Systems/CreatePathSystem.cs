@@ -2,6 +2,7 @@ using ECS.Scripts.GeneralComponents;
 using ECS.Scripts.Path.Component;
 using Leopotam.Ecs;
 using Level;
+using UnityEngine;
 
 namespace ECS.Scripts.Path.Systems
 {
@@ -15,10 +16,16 @@ namespace ECS.Scripts.Path.Systems
         {
             foreach (var unitIndex in _units)
             {
+
+                Debug.Log("Path");
+                
                 ref var entity = ref _units.GetEntity(unitIndex);
 				
                 ref readonly var position = ref _units.Get1(unitIndex).value;
                 ref readonly var targetPosition = ref _units.Get2(unitIndex).value;
+                
+                
+                Debug.Log(targetPosition);
                 
                 var findPath = _levelPN.FindPath(position, targetPosition);
                 

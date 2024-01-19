@@ -1,7 +1,7 @@
 using ECS.Scripts.Data;
 using ECS.Scripts.GeneralComponents;
 using ECS.Scripts.Path.Component;
-using ECS.Scripts.Work;
+using ECS.Scripts.WorkFeature;
 using Leopotam.Ecs;
 using Level;
 using UnityEngine;
