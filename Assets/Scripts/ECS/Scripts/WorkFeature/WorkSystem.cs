@@ -1,10 +1,16 @@
 using System;
 using System.Collections.Generic;
+using ECS.Scripts.CharacterComponent;
 using ECS.Scripts.Data;
 using ECS.Scripts.GeneralComponents;
+using ECS.Scripts.Path.Component;
 using ECS.Scripts.ProviderComponents;
 using ECS.Scripts.TestSystem;
 using Leopotam.Ecs;
+using Unity.Burst;
+using Unity.Collections;
+using Unity.Jobs;
+using Unity.Mathematics;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -50,6 +56,7 @@ namespace ECS.Scripts.WorkFeature
 
         
     }
+    
     public sealed class WorkSystem : IEcsInitSystem, IEcsRunSystem
     {
         private readonly SceneData _sceneData;
@@ -57,7 +64,8 @@ namespace ECS.Scripts.WorkFeature
         private readonly StaticData _staticData;
 
         private readonly EcsFilter<Works>.Exclude<WorkProcess> _filter;
-        private readonly EcsFilter<Item, Position>.Exclude<ItemPlaced> _items;
+        private readonly EcsFilter<MiningTag, Position>.Exclude<ItemPlaced> _items;
+       
             
         
         private Dictionary<WorkType, Func<bool>> _conditions;
@@ -79,6 +87,7 @@ namespace ECS.Scripts.WorkFeature
             foreach (var index in _filter)
             {
                 ref var works = ref _filter.Get1(index);
+                
                 foreach (var work in works.value)
                 {
                     if (work.value.IsDone())
