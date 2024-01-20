@@ -279,7 +279,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3d95000c4e704841b3d21c0458fbf3d2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _sizeGrid: {x: 100, y: 100}
+  _sizeGrid: {x: 120, y: 120}
   _camera: {fileID: 1953946219}
   _tilemap: {fileID: 1032329146}
   _tileBase: {fileID: 11400000, guid: ad4d07f4492224a409901d30c4b417b8, type: 2}
@@ -912,7 +912,7 @@ Camera:
   far clip plane: 10
   field of view: 60
   orthographic: 1
-  orthographic size: 10
+  orthographic size: 71.56
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2

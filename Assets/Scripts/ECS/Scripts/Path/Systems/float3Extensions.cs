@@ -13,17 +13,17 @@ namespace ECS.Scripts.Path.Systems
         {
             float deltaX = target.x - current.x;
             float deltaY = target.y - current.y;
-            float deltaZ = target.z - current.z;
 
-            float sqdist = deltaX * deltaX + deltaY * deltaY  + deltaZ * deltaZ ;
+            float sqdist = deltaX * deltaX + deltaY * deltaY;
 
             if (sqdist == 0 || sqdist <= maxDistanceDelta * maxDistanceDelta)
                 return target;
-            var dist = math.sqrt(sqdist);
+            var dist = math.sqrt(sqdist); // 25 5  1 / 5 * delta
 
-            return new float3(current.x + deltaX / dist * maxDistanceDelta,
-                current.y + deltaY / dist * maxDistanceDelta,
-                current.z + deltaZ / dist * maxDistanceDelta);
+            dist = 1 / dist * maxDistanceDelta;
+
+            return new float3(current.x + deltaX * dist,
+                current.y + deltaY * dist, 0f);
         }
     }
 }

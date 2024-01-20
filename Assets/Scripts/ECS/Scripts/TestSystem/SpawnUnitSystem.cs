@@ -60,6 +60,7 @@ namespace ECS.Scripts.TestSystem
         private readonly ISelectionService _selectionService;
         
         private readonly EcsFilter<Item, Position>.Exclude<ItemPlaced> _items;
+        private readonly EcsFilter<Unit> _units;
         private readonly EcsFilter<MiningTag, Position>.Exclude<ItemPlaced> _mining;
         private FindItemWork _findItemWork;
         private FindMineWork _findMineWork;
@@ -78,13 +79,15 @@ namespace ECS.Scripts.TestSystem
 
                 var instanceObject = Object.Instantiate(_staticData.UnitPrefab);
 
+                instanceObject.gameObject.SetActive(false);
+                
                 var entityUnit = _world.NewEntity();
 
                 entityUnit.Get<Unit>();
                 entityUnit.Get<TransformRef>().value = instanceObject.transform;
                 entityUnit.Get<Selected>();
                 entityUnit.Get<RandMove>();
-
+                
                 var cameraRay = Object.FindFirstObjectByType<CameraController>();
                 var pos = cameraRay.GetWorldPosition();
                 pos.z = 0;
@@ -115,6 +118,9 @@ namespace ECS.Scripts.TestSystem
 
                 count--;
             }
+            var window = Object.FindFirstObjectByType<UnitWindow>();
+            
+            window.SetParts($"Count:" + _units.GetEntitiesCount());
 
             // _selectionService.SelectUnit(entityUnit);
         }
