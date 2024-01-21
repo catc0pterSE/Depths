@@ -1,29 +1,30 @@
-using Leopotam.Ecs;
+using ECS.Scripts.Boot;
+using Leopotam.EcsProto;
+using Leopotam.EcsProto.QoL;
 using UnityEngine;
 
 namespace ECS.Scripts.TestSystem
 {
-    public sealed class BodyStateReactionSystem : IEcsRunSystem
+    public sealed class BodyStateReactionSystem : IProtoRunSystem
     {
-        private readonly EcsFilter<Head, Health, OnChangeHealth> _head;
-        private readonly EcsFilter<Part, Health, OnChangeHealth> _parts;
+        [DI] private readonly MainAspect _aspect;
         public void Run()
         {
-            foreach (var i in _head)
+            foreach (var i in _aspect.HeadsChangeHealth)
             {
-                ref var entity = ref _head.GetEntity(i);
-                ref var health = ref _head.Get2(i).value;
+                ref var health = ref _aspect.Health.Get(i).value;
 
                 if (health <= 0)
                 {
-                    entity.Get<Owner>().value.Get<DiedEvent>();
+                    _aspect.DiedsEvent.Add(i);
                 }
             }
             
-            foreach (var i in _parts)
+            foreach (var i in _aspect.PartsChangeHealth)
             {
-                ref var part = ref _parts.Get1(i).value;
-                ref var health = ref _parts.Get2(i).value;
+                ref var part = ref _aspect.Parts.Get(i).value;
+                ref var health = ref _aspect.Health.Get(i).value;
+                
                 Debug.Log($"{part.ToString()} : {health}");
             }
         }

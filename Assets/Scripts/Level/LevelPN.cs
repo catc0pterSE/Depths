@@ -23,7 +23,7 @@ namespace Level
         private IGrid _grid;
         private PathFinding _pathFinding;
         public Pathfinder _finder;
-        private List<CellPFModel> _path;
+        private List<Vector3> _path;
 
         private void Awake()
         {
@@ -78,7 +78,7 @@ namespace Level
             }
         }
         
-        // public List<CellPFModel> FindPath(Vector3 startPosition, Vector3 finishPosition)
+        // public List<Vector3> FindPath(Vector3 startPosition, Vector3 finishPosition)
         // {
         //     _path = _pathFinding.FindPath(startPosition, finishPosition);
         //
@@ -87,8 +87,8 @@ namespace Level
         
         public List<Vector3> FindPath(Vector3 startPosition, Vector3 finishPosition)
         {
-            var start = new Vector3Int(Mathf.FloorToInt(startPosition.x), Mathf.FloorToInt(startPosition.y));
-            var end = new Vector3Int(Mathf.FloorToInt(finishPosition.x), Mathf.FloorToInt(finishPosition.y));
+            var start = new Vector3Int(Mathf.RoundToInt(startPosition.x), Mathf.RoundToInt(startPosition.y));
+            var end = new Vector3Int(Mathf.RoundToInt(finishPosition.x), Mathf.RoundToInt(finishPosition.y));
             var path  = _finder.FindPath(start, end);
             return path;
         }

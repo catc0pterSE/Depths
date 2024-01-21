@@ -1,10 +1,10 @@
-using Leopotam.Ecs;
+using Leopotam.EcsProto;
 using Level;
 using UnityEngine;
 
-namespace ECS.Scripts.Path.Systems
+namespace ECS.Scripts.PathFeature.Systems
 {
-    public sealed class SetNotWalkingSystem : IEcsRunSystem
+    public sealed class SetNotWalkingSystem : IProtoRunSystem
     {
         private readonly LevelPN _levelPN;
         public void Run()

@@ -1,7 +1,7 @@
 using Unity.Mathematics;
 using UnityEngine;
 
-namespace ECS.Scripts.Path.Systems
+namespace ECS.Scripts.PathFeature.Systems
 {
     public static class float3Extensions
     {

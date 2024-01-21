@@ -1,11 +1,12 @@
 using ECS.Scripts.TestSystem;
 using Leopotam.Ecs;
+using Leopotam.EcsProto.QoL;
 
 namespace ECS.Scripts.Boot
 {
     public sealed class UnitPresenter
     {
-        private EcsEntity _entity;
+        private ProtoPackedEntity _entity;
         private readonly UnitWindow _unitWindow;
         private readonly ISelectionService _selectionService;
         public UnitPresenter(ISelectionService selectionService, UnitWindow unitWindow)
@@ -16,30 +17,35 @@ namespace ECS.Scripts.Boot
             _unitWindow = unitWindow;
         }
 
-        public void OnUnitSelected(EcsEntity entity)
+        public void OnUnitSelected(ProtoPackedEntity entity, MainAspect aspect)
         {
             _entity = entity;
-
-            var stats = _entity.Get<Stats>().value;
+            _entity.Unpack(aspect.World(), out var unPackEntity);
+            var stats = aspect.Stats.Get(unPackEntity).value;
 
             string description = "";
 			
             foreach (var statEntity in stats.Values)
             {
-                ref readonly var stat = ref statEntity.Get<Stat>();
+                statEntity.Unpack(aspect.World(), out var unPackStatEntity);
+                
+                ref readonly var stat = ref aspect.Stat.Get(unPackStatEntity);
+                
                 description += stat.type + ": " + stat.TotalValue() + "\n";
             } 
 
             _unitWindow.SetStats(description);
 			
-            var parts = _entity.Get<Body>().parts;
+            var parts = aspect.Bodies.Get(unPackEntity).parts;
 			
             description = "";
 			
             foreach (var partEntity in parts.Values)
             {
-                ref readonly var part = ref partEntity.Get<Part>().value;
-                ref readonly var health = ref partEntity.Get<Health>().value;
+                partEntity.Unpack(aspect.World(), out var unPackPartEntity);
+                
+                ref readonly var part = ref aspect.Parts.Get(unPackPartEntity);
+                ref readonly var health = ref aspect.Health.Get(unPackPartEntity);
                 description += part + ": " + health + "\n";
             } 
 			
