@@ -3,6 +3,7 @@ using System.Linq;
 using Grid;
 using Grid.Elements;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace PathFindingSystem
 {
@@ -13,19 +14,19 @@ namespace PathFindingSystem
 
         private readonly IGrid _gridPN;
 
-        private List<CellPFModel> _openList;
-        private List<CellPFModel> _closedList;
+        private List<CellPFModel> _openList = new List<CellPFModel>(100);
+        private List<CellPFModel> _closedList = new List<CellPFModel>(100);
 
         public PathFinding(IGrid gridPn) =>
             _gridPN = gridPn;
-
+       
+        
         public List<CellPFModel> FindPath(Vector3 startPosition, Vector3 finishPosition)
         {
             CellPFModel startCellPf = _gridPN.FromWorldToCell(startPosition);
             CellPFModel endCellPf = _gridPN.FromWorldToCell(finishPosition);
 
-            _openList = new List<CellPFModel> { startCellPf };
-            _closedList = new List<CellPFModel>();    
+            _openList.Add(startCellPf);
 
             SetStatsCell(startCellPf, 0, endCellPf);
 
@@ -64,13 +65,19 @@ namespace PathFindingSystem
                             _openList.Add(neighbourCell);
                     }
                 }
+                
+                neighboursCells.Clear();
             }
             
-            
-            var cellPath = CalculatePath(endCellPf);
+            var path = ListPool<CellPFModel>.Get();;
+            path.Add(endCellPf);
+            var cellPath = CalculatePath(path, endCellPf);
                 
             ResettingIndicators(_openList);
             ResettingIndicators(_closedList);
+            
+            _openList.Clear();
+            _closedList.Clear();
 
             return cellPath;
         }
@@ -81,10 +88,10 @@ namespace PathFindingSystem
                 cellView.ResettingIndicators();
         }
 
+        List<CellPFModel> neighboursCells = new List<CellPFModel>(9);
+        
         private List<CellPFModel> Neighbours(CellPFModel target)
         {
-            List<CellPFModel> neighboursCells = new List<CellPFModel>();
-
             for (int x = target.GridPosition.x - 1; x <= target.GridPosition.x + 1; x++)
             {
                 for (int y = target.GridPosition.y - 1; y <= target.GridPosition.y + 1; y++)
@@ -101,10 +108,8 @@ namespace PathFindingSystem
             return neighboursCells;
         }
     
-        private List<CellPFModel> CalculatePath(CellPFModel cell)
+        private List<CellPFModel> CalculatePath( List<CellPFModel> path, CellPFModel cell)
         {
-            var path = new List<CellPFModel> { cell };
-
             CellPFModel currentNode = cell;
             while (currentNode.ComeFromCellPf != null)
             {
@@ -112,12 +117,24 @@ namespace PathFindingSystem
                 currentNode = currentNode.ComeFromCellPf;
             }
 
-            path.Reverse();
+            // path.Reverse();
             return path;
         }
 
-        private CellPFModel GetLowestTotalCostNode(IReadOnlyCollection<CellPFModel> openList) => 
-            openList.FirstOrDefault(element => element.TotalCost == openList.Min(element => element.TotalCost));
+        // private CellPFModel GetLowestTotalCostNode(IReadOnlyCollection<CellPFModel> openList) => 
+        //     openList.FirstOrDefault(element => element.TotalCost == openList.Min(element => element.TotalCost));
+
+        private CellPFModel GetLowestTotalCostNode(List<CellPFModel> openList)
+        {
+            var lowestCostPathCell = openList[0];
+            for (int i = 1; i < openList.Count; i++)
+            {
+                var testCell = openList[i];
+                if (testCell.TotalCost < lowestCostPathCell.TotalCost) lowestCostPathCell = testCell;
+            }
+
+            return lowestCostPathCell;
+        }
 
         private int CalculateDistanceCost(CellPFModel first, CellPFModel second)
         {

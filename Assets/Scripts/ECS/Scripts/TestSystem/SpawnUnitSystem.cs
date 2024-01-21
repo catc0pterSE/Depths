@@ -78,9 +78,6 @@ namespace ECS.Scripts.TestSystem
             {
 
                 var instanceObject = Object.Instantiate(_staticData.UnitPrefab);
-
-                instanceObject.gameObject.SetActive(false);
-                
                 var entityUnit = _world.NewEntity();
 
                 entityUnit.Get<Unit>();

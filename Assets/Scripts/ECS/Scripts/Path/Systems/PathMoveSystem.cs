@@ -1,14 +1,18 @@
 using System.Threading.Tasks;
 using ECS.Scripts.Data;
 using ECS.Scripts.GeneralComponents;
+using ECS.Scripts.Path.Components;
 using ECS.Scripts.TestSystem;
 using ECS.Scripts.WorkFeature;
+using Grid.Elements;
 using Leopotam.Ecs;
+using Level;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace ECS.Scripts.Path.Systems
 {
@@ -19,8 +23,11 @@ namespace ECS.Scripts.Path.Systems
         private readonly StaticData _staticData;
 
         private readonly EcsFilter<Position, Components.Path> _unitsPath;
+        private readonly EcsFilter<Position, Components.Path, UpdatePath> _unitsUpdate;
         
         private readonly EcsFilter<Position, Direction, Speed> _unitsMoveDirection;
+
+        private readonly LevelPN _levelPn;
         
         
         [BurstCompile]
@@ -66,25 +73,47 @@ namespace ECS.Scripts.Path.Systems
                 
                 var cellView = points.value[points.index];
                 
-                var dir = cellView.WorldPosition - position;
+                var dir = cellView - position;
                 
                 if(dir.sqrMagnitude == 0f)
                 {
-                    points.index++;
-
-                    if (points.index >= points.value.Count)
+                    points.index--;
+                    if (points.index == -1)
                     {
+                        ListPool<Vector3>.Release(points.value);
+                        
                         entity.Del<Direction>();
                         entity.Del<Components.Path>();
                         
                         continue;
                     }
+                    else
+                    {
+                        entity.Get<UpdatePath>();
+                    }
                 }
 
                 // entity.Get<Direction>().value = dir.normalized;
-                entity.Get<Direction>().value = cellView.WorldPosition;
+                entity.Get<Direction>().value = cellView;
             }
 
+              
+            // foreach (var index in _unitsUpdate)
+            // {
+            //     ref var position = ref _unitsUpdate.Get1(index).value;
+            //     
+            //     ref var points = ref _unitsUpdate.Get2(index);
+            //     
+            //     ref var entity = ref _unitsUpdate.GetEntity(index);
+            //     
+            //     _levelPn.FindPath(position, points.value[^1].WorldPosition, points.value);
+            //
+            //     points.index = 0;
+            //     
+            //     entity.Del<UpdatePath>();
+            // }
+
+            
             
             if (_unitsMoveDirection.IsEmpty()) return;
             

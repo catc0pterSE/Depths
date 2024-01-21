@@ -22,6 +22,7 @@ namespace Level
 
         private IGrid _grid;
         private PathFinding _pathFinding;
+        public Pathfinder _finder;
         private List<CellPFModel> _path;
 
         private void Awake()
@@ -76,16 +77,20 @@ namespace Level
                 SetColorElement(startNode);
             }
         }
-
-
-        public List<CellPFModel> FindPath(Vector3 startPosition, Vector3 finishPosition)
+        
+        // public List<CellPFModel> FindPath(Vector3 startPosition, Vector3 finishPosition)
+        // {
+        //     _path = _pathFinding.FindPath(startPosition, finishPosition);
+        //
+        //     return _path;
+        // }
+        
+        public List<Vector3> FindPath(Vector3 startPosition, Vector3 finishPosition)
         {
-            _path = _pathFinding.FindPath(startPosition, finishPosition);
-            
-            // for (int i = 1; i < _path.Count - 1; i++)
-            //     SetColorElement(_path[i]);
-
-            return _path;
+            var start = new Vector3Int(Mathf.FloorToInt(startPosition.x), Mathf.FloorToInt(startPosition.y));
+            var end = new Vector3Int(Mathf.FloorToInt(finishPosition.x), Mathf.FloorToInt(finishPosition.y));
+            var path  = _finder.FindPath(start, end);
+            return path;
         }
 
         public void SetNotWalkingNode()

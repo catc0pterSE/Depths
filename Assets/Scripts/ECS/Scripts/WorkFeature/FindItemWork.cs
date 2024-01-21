@@ -61,42 +61,40 @@ namespace ECS.Scripts.WorkFeature
         }
         public void GiveWork(EcsEntity entity)
         {
-            // ref readonly var position = ref entity.Get<Position>().value;
-            //
-            // var positionNative = new NativeArray<DistanceData>(_items.GetEntitiesCount(), Allocator.TempJob);
-            // var positionNativeOut = new NativeArray<DistanceData>(1, Allocator.TempJob);
-            //
-            // var distanceDataLoad = new DistanceData();
-            // distanceDataLoad.indexEntity = 0;
-            // distanceDataLoad.distance =  100000f;
-            //
-            // positionNativeOut[0] = distanceDataLoad;
-            //
-            //
-            // for (int i = 0; i < positionNative.Length; i++)
-            // {
-            //     var distanceData = new DistanceData();
-            //     distanceData.PositionItem = _items.Get2(i).value;
-            //     distanceData.indexEntity = i;
-            //     positionNative[i] = distanceData;
-            // }
-            //
-            // DistanceJob moveJob = new DistanceJob { Position = position, DistanceOut = positionNativeOut, Distance = positionNative};
-            //
-            // var jobHandle = moveJob.Schedule();
-            //
-            // jobHandle.Complete();
-            //
-            // var findEntity = _items.GetEntity( positionNativeOut[0].indexEntity);
-            //
+            ref readonly var position = ref entity.Get<Position>().value;
+   
+            var positionNative = new NativeArray<DistanceData>(_items.GetEntitiesCount(), Allocator.TempJob);
+            var positionNativeOut = new NativeArray<DistanceData>(1, Allocator.TempJob);
 
-            var itemEntity = _items.GetEntity(0);
-            itemEntity.Get<ItemPlaced>();
-            entity.Get<MineProcess>().ItemEntity = itemEntity;
-            entity.Get<TargetPath>().value = itemEntity.Get<Position>().value;
+            var distanceDataLoad = new DistanceData();
+            distanceDataLoad.indexEntity = 0;
+            distanceDataLoad.distance =  100000f;
+            
+            positionNativeOut[0] = distanceDataLoad;
+            
+            
+            for (int i = 0; i < positionNative.Length; i++)
+            {
+                var distanceData = new DistanceData();
+                distanceData.PositionItem = _items.Get2(i).value;
+                distanceData.indexEntity = i;
+                positionNative[i] = distanceData;
+            }
 
-            // positionNative.Dispose();
-            // positionNativeOut.Dispose();
+            DistanceJob moveJob = new DistanceJob { Position = position, DistanceOut = positionNativeOut, Distance = positionNative};
+
+            var jobHandle = moveJob.Schedule();
+            
+            jobHandle.Complete();
+            
+            var findEntity = _items.GetEntity( positionNativeOut[0].indexEntity);
+            
+            findEntity.Get<ItemPlaced>();
+            entity.Get<MineProcess>().ItemEntity = findEntity;
+            entity.Get<TargetPath>().value = positionNativeOut[0].PositionItem;
+
+            positionNative.Dispose();
+            positionNativeOut.Dispose();
         }
     }
     public class FindItemWork : IWork

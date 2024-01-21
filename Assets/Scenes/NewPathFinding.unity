@@ -284,6 +284,7 @@ MonoBehaviour:
   _tilemap: {fileID: 1032329146}
   _tileBase: {fileID: 11400000, guid: ad4d07f4492224a409901d30c4b417b8, type: 2}
   _tileBase2: {fileID: 11400000, guid: d9db677e0e9f1584e8d890f9f6a2b3f8, type: 2}
+  _finder: {fileID: 573243697}
 --- !u!4 &190339190
 Transform:
   m_ObjectHideFlags: 0
@@ -354,6 +355,7 @@ GameObject:
   m_Component:
   - component: {fileID: 573243696}
   - component: {fileID: 573243695}
+  - component: {fileID: 573243697}
   m_Layer: 0
   m_Name: Game
   m_TagString: Untagged
@@ -393,6 +395,18 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &573243697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 573243694}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 303fc2ff0316a724b830c503eb42f8a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1032329143
 GameObject:
   m_ObjectHideFlags: 0
