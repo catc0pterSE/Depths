@@ -1,23 +1,27 @@
+using ECS.Scripts.Boot;
 using ECS.Scripts.Data;
 using Leopotam.Ecs;
+using Leopotam.EcsProto;
+using Leopotam.EcsProto.QoL;
 
 namespace ECS.Scripts.WorkFeature
 {
-    public sealed class WorkCancelSystem : IEcsRunSystem
+    public sealed class WorkCancelSystem : IProtoRunSystem
     {
-        private readonly SceneData _sceneData;
-        private readonly RuntimeData _runtimeData;
-        private readonly StaticData _staticData;
+        [DI] private readonly SceneData _sceneData;
+        [DI] private readonly RuntimeData _runtimeData;
+        [DI] private readonly StaticData _staticData;
+        
+        
+        [DI] private readonly MainAspect _aspect;
 
-        private readonly EcsFilter<WorkProcess, CancelWork> _filter;
 
         public void Run()
         {
-            foreach (var index in _filter)
+            foreach (var index in _aspect.CancelWorkF)
             {
-                ref var entity = ref _filter.GetEntity(index);
-                entity.Del<WorkProcess>();
-                entity.Del<CancelWork>();
+                _aspect.WorkProcess.Del(index);
+                _aspect.CancelWork.Del(index);
             }
         }
 

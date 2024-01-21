@@ -1,23 +1,21 @@
-using ECS.Scripts.GeneralComponents;
-using ECS.Scripts.ProviderComponents;
-using ECS.Scripts.WorkFeature;
-using Leopotam.Ecs;
+using ECS.Scripts.Boot;
+using Leopotam.EcsProto;
+using Leopotam.EcsProto.QoL;
 
 namespace ECS.Scripts.SyncSystems
 {
 
-    public sealed class UpdatePositionSystem : IEcsRunSystem
+    public sealed class UpdatePositionSystem : IProtoRunSystem
     {
-        private readonly EcsFilter<TransformRef, Position>.Exclude<Sync> _syncPosition;
-        
+        [DI] private MainAspect _aspect;
         public void Run()
         {
-            foreach (var index in _syncPosition)
+            foreach (var index in _aspect.SyncPosition)
             {
-                ref readonly var transform = ref _syncPosition.Get1(index);
-                ref readonly var position = ref _syncPosition.Get2(index);
+                ref readonly var transform = ref _aspect.Transforms.Get(index).value;
+                ref readonly var position = ref _aspect.Position.Get(index).value;
                 
-                transform.value.position = position.value;
+                transform.position = position;
             }
         }
     }

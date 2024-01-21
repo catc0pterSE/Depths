@@ -1,8 +1,7 @@
 using System.Collections.Generic;
-using Grid.Elements;
 using UnityEngine;
 
-namespace ECS.Scripts.Path.Components
+namespace ECS.Scripts.PathFeature.Components
 {
     public struct UpdatePath
     {

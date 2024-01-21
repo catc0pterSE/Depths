@@ -8,6 +8,8 @@ using ECS.Scripts.GeneralComponents;
 using ECS.Scripts.ProviderComponents;
 using ECS.Scripts.WorkFeature;
 using Leopotam.Ecs;
+using Leopotam.EcsProto;
+using Leopotam.EcsProto.QoL;
 using Level;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -15,12 +17,10 @@ using Random = UnityEngine.Random;
 
 namespace ECS.Scripts.TestSystem
 {
-    public sealed class SpawnItemSystem : IEcsRunSystem
+    public sealed class SpawnItemSystem : IProtoRunSystem
     {
-        private readonly SceneData _sceneData;
-        private readonly RuntimeData _runtimeData;
-        private readonly StaticData _staticData;
-        private readonly EcsWorld _world;
+        [DI]private readonly StaticData _staticData;
+        [DI] private readonly MainAspect _aspect;
 
         public void Run()
         {
@@ -34,16 +34,18 @@ namespace ECS.Scripts.TestSystem
             {
                 var instanceObject = Object.Instantiate(_staticData.MinePrefab);
 
-                var entityUnit = _world.NewEntity();
-
-                entityUnit.Get<MiningTag>();
-                entityUnit.Get<Health>().value = 5f;
-                entityUnit.Get<TransformRef>().value = instanceObject.transform;
-
-                var pos =  new Vector3(Random.Range(0f, 50f), Random.Range(0f, 50f));;
+                var entityUnit = _aspect.World().NewEntity();
+                
+                
+                
+                _aspect.MiningTag.Add(entityUnit);
+                _aspect.Health.Add(entityUnit).value = 5f;
+                _aspect.Transforms.Add(entityUnit).value = instanceObject.transform;
+                
+                var pos =  new Vector3(Random.Range(0f, 100f), Random.Range(0f, 100f));
                 pos.x = MathF.Round(pos.x);
                 pos.y = MathF.Round(pos.y);
-                entityUnit.Get<Position>().value = pos;
+                _aspect.Position.Add(entityUnit).value = pos;
 
                 count--;
             }
@@ -51,19 +53,16 @@ namespace ECS.Scripts.TestSystem
 
         
     }
-    public sealed class SpawnUnitSystem : IEcsRunSystem, IEcsInitSystem
+    public sealed class SpawnUnitSystem : IProtoRunSystem, IProtoInitSystem
     {
-        private readonly EcsWorld _world;
-		
-        private readonly StaticData _staticData;
-
-        private readonly ISelectionService _selectionService;
+        [DI] private readonly StaticData _staticData;
         
-        private readonly EcsFilter<Item, Position>.Exclude<ItemPlaced> _items;
-        private readonly EcsFilter<Unit> _units;
-        private readonly EcsFilter<MiningTag, Position>.Exclude<ItemPlaced> _mining;
         private FindItemWork _findItemWork;
         private FindMineWork _findMineWork;
+
+        [DI] private readonly MainAspect _aspect;
+
+        private int _i;
 
         public void Run()
         {
@@ -78,20 +77,22 @@ namespace ECS.Scripts.TestSystem
             {
 
                 var instanceObject = Object.Instantiate(_staticData.UnitPrefab);
-                var entityUnit = _world.NewEntity();
-
-                entityUnit.Get<Unit>();
-                entityUnit.Get<TransformRef>().value = instanceObject.transform;
-                entityUnit.Get<Selected>();
-                entityUnit.Get<RandMove>();
                 
                 var cameraRay = Object.FindFirstObjectByType<CameraController>();
                 var pos = cameraRay.GetWorldPosition();
                 pos.z = 0;
+                
+                
+                var entityUnit = _aspect.World().NewEntity();
 
 
-
-                entityUnit.Get<Position>().value = pos;
+                _aspect.Units.Add(entityUnit);
+                _aspect.Transforms.Add(entityUnit).value = instanceObject.transform;
+                _aspect.Position.Add(entityUnit).value = pos;
+                
+                _aspect.Selected.Add(entityUnit);
+                _aspect.RandMove.Add(entityUnit);
+                
 
                 CreateBody(entityUnit);
 
@@ -107,7 +108,7 @@ namespace ECS.Scripts.TestSystem
                 findMine.value = _findMineWork;
                 
 
-                entityUnit.Get<Works>().value = new Work[]
+                _aspect.Works.Add(entityUnit).value = new Work[]
                 {
                     findMine,
                     findWork
@@ -116,63 +117,61 @@ namespace ECS.Scripts.TestSystem
                 count--;
             }
             var window = Object.FindFirstObjectByType<UnitWindow>();
-            
-            window.SetParts($"Count:" + _units.GetEntitiesCount());
-
-            // _selectionService.SelectUnit(entityUnit);
+            _i++;
+            window.SetParts($"Count:" + 100 * _i);
         }
 
-        private void CreateStats(EcsEntity entityUnit)
+        private void CreateStats(ProtoEntity entityUnit)
         {
-            ref var stats = ref entityUnit.Get<Stats>();
-            stats.value = new Dictionary<StatType, EcsEntity>();
+            ref var stats = ref _aspect.Stats.Add(entityUnit);
+            stats.value = new Dictionary<StatType, ProtoPackedEntity>();
 
+
+            _aspect.Speed.Add(entityUnit).value = 10f;
+            
             foreach (var statData in _staticData.StatsData)
             {
-                var statEntity = _world.NewEntity();
-                statEntity.Get<Stat>().type = statData.Stat;
-                statEntity.Get<Stat>().value = 10f;
+                var statEntity = _aspect.World().NewEntity();
 
 
-                if (statData.Stat == StatType.Speed)
-                {
-                    entityUnit.Get<Speed>().value = 10f;
-                }
+                var stat = new Stat();
+                stat.type = statData.Stat;
+                stat.value = 10f;
                 
+                _aspect.Stat.Add(statEntity) = stat;
                 
-                stats.value.Add(statData.Stat, statEntity);
+                stats.value.Add(statData.Stat, _aspect.World().PackEntity(statEntity));
             }
         }
 
         
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        private void CreateBody(EcsEntity entityUnit)
+        private void CreateBody(ProtoEntity entityUnit)
         {
-            ref var body = ref entityUnit.Get<Body>();
+            ref var body = ref _aspect.Bodies.Add(entityUnit);
 
-            body.parts = new Dictionary<BodyPart, EcsEntity>();
+            body.parts = new Dictionary<BodyPart, ProtoPackedEntity>();
             foreach (var bodyPartData in _staticData.BodyPartsData)
             {
-                var partEntity = _world.NewEntity();
+                var partEntity =  _aspect.World().NewEntity();
                 
-                partEntity.Get<Health>().value  = 100f;
-                partEntity.Get<Part>().value    = bodyPartData.Part;
-                partEntity.Get<Owner>().value   = entityUnit;
+                _aspect.Health.Add(partEntity).value  = 100f;
+                _aspect.Parts.Add(partEntity).value   = bodyPartData.Part;
+                _aspect.Owners.Add(partEntity).value  = _aspect.World().PackEntity(entityUnit);
 
                 switch (bodyPartData.Part)
                 {
-                    case BodyPart.Head: partEntity.Get<Head>();
+                    case BodyPart.Head:  _aspect.Heads.Add(partEntity);
                         break;
                 }
                 
-                body.parts.Add(bodyPartData.Part, partEntity);
+                body.parts.Add(bodyPartData.Part, _aspect.World().PackEntity(partEntity));
             }
         }
-
-        public void Init()
+        public void Init(IProtoSystems systems)
         {
-            _findItemWork = new FindItemWork(_items);
-            _findMineWork = new FindMineWork(_mining);
+            _findItemWork = new FindItemWork(_aspect);
+            _findMineWork = new FindMineWork(_aspect);
         }
     }
 }

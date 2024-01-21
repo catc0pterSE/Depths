@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ECS.Scripts.Boot;
 using ECS.Scripts.CharacterComponent;
 using ECS.Scripts.Data;
 using ECS.Scripts.GeneralComponents;
@@ -7,6 +8,8 @@ using ECS.Scripts.Path.Component;
 using ECS.Scripts.ProviderComponents;
 using ECS.Scripts.TestSystem;
 using Leopotam.Ecs;
+using Leopotam.EcsProto;
+using Leopotam.EcsProto.QoL;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -17,39 +20,34 @@ using Object = UnityEngine.Object;
 namespace ECS.Scripts.WorkFeature
 {
 
-    public sealed class MineDiedSystem : IEcsRunSystem
+    public sealed class MineDiedSystem : IProtoRunSystem
     {
-        private readonly SceneData _sceneData;
-        private readonly RuntimeData _runtimeData;
-        private readonly StaticData _staticData;
-
-        private readonly EcsWorld _world;
+        [DI]  private readonly StaticData _staticData;
+        [DI] private readonly MainAspect _aspect;
 
         private readonly EcsFilter<MiningTag, Health, Position> _filter;
 
         public void Run()
         {
-            foreach (var index in _filter)
+            foreach (var index in _aspect.MiningDied)
             {
-                ref var health = ref _filter.Get2(index).value;
+                ref var health = ref _aspect.Health.Get(index).value;
                 
                 if(health <= 0)
                 {
-
-                    var entity = _filter.GetEntity(index);
-                    entity.Del<MiningTag>();
-                    entity.Get<TransformRef>().value.gameObject.SetActive(false);
+                    _aspect.MiningTag.Del(index);
+                    _aspect.Transforms.Get(index).value.gameObject.SetActive(false);
                     
                     
-                    ref readonly var position = ref _filter.Get3(index).value;
+                    ref readonly var position = ref _aspect.Position.Get(index).value;
                     
                     var instanceObject = Object.Instantiate(_staticData.ItemPrefab);
             
-                    var entityUnit = _world.NewEntity();
+                    var entityUnit = _aspect.World().NewEntity();
                     
-                    entityUnit.Get<Item>();
-                    entityUnit.Get<Position>().value = position;
-                    entityUnit.Get<TransformRef>().value = instanceObject.transform;
+                    _aspect.Items.Add(entityUnit);
+                    _aspect.Position.Add(entityUnit).value = position;
+                    _aspect.Transforms.Add(entityUnit).value = instanceObject.transform;
                 }
             }
         }
@@ -57,16 +55,15 @@ namespace ECS.Scripts.WorkFeature
         
     }
     
-    public sealed class WorkSystem : IEcsInitSystem, IEcsRunSystem
+    public sealed class WorkSystem : IProtoInitSystem, IProtoRunSystem
     {
-        private readonly SceneData _sceneData;
-        private readonly RuntimeData _runtimeData;
-        private readonly StaticData _staticData;
-
-        private readonly EcsFilter<Works, Position>.Exclude<WorkProcess, Path.Components.Path> _workers;
+        [DI] private readonly SceneData _sceneData;
+        [DI] private readonly RuntimeData _runtimeData;
+        [DI] private readonly StaticData _staticData;
         
-        private readonly EcsFilter<MiningTag, Position>.Exclude<ItemPlaced> _mining;
+        private readonly EcsFilter<MiningTag, Position>.Exclude<ItemBusy> _mining;
            
+        [DI] private readonly MainAspect _aspect;
         
         private Dictionary<WorkType, Func<bool>> _conditions;
         
@@ -149,28 +146,19 @@ namespace ECS.Scripts.WorkFeature
             FindItem,
             Mining,
         }
-
-        public void Init()
-        {
-            _conditions = new Dictionary<WorkType, Func<bool>>()
-            {
-                [WorkType.Mining] = () => !_mining.IsEmpty(),
-            };
-        }
         public void Run()
         {
-            foreach (var worker in _workers)
+            foreach (var worker in _aspect.WorkersNotWorking)
             {
-                var work = _workers.Get1(worker);
+                var work = _aspect.Works.Get(worker);
                 foreach (var work1 in work.value)
                 {
                     if (work1.value.IsDone())
                     {
-                        var entity = _workers.GetEntity(worker);
-                        
-                        work1.value.GiveWork(entity);
+    
+                        work1.value.GiveWork(worker);
 
-                        entity.Get<WorkProcess>();
+                        _aspect.WorkProcess.Add(worker);
                     }
                 }
             }
@@ -239,6 +227,13 @@ namespace ECS.Scripts.WorkFeature
             //     distanceWorkers.Dispose();
             // }
         }
-        
+
+        public void Init(IProtoSystems systems)
+        {
+            _conditions = new Dictionary<WorkType, Func<bool>>()
+            {
+                [WorkType.Mining] = () => !_mining.IsEmpty(),
+            };
+        }
     }
 }

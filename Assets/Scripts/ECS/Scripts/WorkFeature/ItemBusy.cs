@@ -1,6 +1,6 @@
 namespace ECS.Scripts.WorkFeature
 {
-    public struct ItemPlaced
+    public struct ItemBusy
     {
     }
 }

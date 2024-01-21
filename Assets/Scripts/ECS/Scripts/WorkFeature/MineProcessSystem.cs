@@ -1,8 +1,11 @@
+using ECS.Scripts.Boot;
 using ECS.Scripts.Data;
 using ECS.Scripts.GeneralComponents;
 using ECS.Scripts.Path.Component;
 using ECS.Scripts.TestSystem;
 using Leopotam.Ecs;
+using Leopotam.EcsProto;
+using Leopotam.EcsProto.QoL;
 
 namespace ECS.Scripts.WorkFeature
 {
@@ -11,56 +14,53 @@ namespace ECS.Scripts.WorkFeature
     {
         public float value;
     }
-    public sealed class MineProcessSystem : IEcsRunSystem
+    public sealed class MineProcessSystem : IProtoRunSystem
     {
-        private readonly SceneData _sceneData;
-        private readonly RuntimeData _runtimeData;
-        private readonly StaticData _staticData;
-
-        private readonly EcsFilter<MineProcess, Position>.Exclude<Mining> _filter;
+        [DI] private readonly SceneData _sceneData;
+        [DI] private readonly RuntimeData _runtimeData;
+        [DI] private readonly StaticData _staticData;
         
-        private readonly EcsFilter<MineProcess, Position, Mining> _mining;
         
-        private readonly EcsFilter<MineProcess, CancelWork> _cancel;
+        [DI] private readonly MainAspect _aspect;
         public void Run()
         {
-            foreach (var index in _filter)
+            foreach (var index in _aspect.MiningProcessMove)
             {
-                ref readonly var component = ref _filter.Get1(index);
-                ref readonly var position = ref _filter.Get2(index).value;
+                ref readonly var component = ref _aspect.MineProcess.Get(index);
+                ref readonly var position = ref _aspect.Position.Get(index).value;
+
+                component.ItemEntity.Unpack(_aspect.World(), out var itemEntity);
                 
-                ref var positionItem = ref component.ItemEntity.Get<Position>().value;
+                ref var positionItem = ref _aspect.Position.Get(itemEntity).value;
 
                 var dist = (position - positionItem).sqrMagnitude;
-                var entity = _filter.GetEntity(index);
                 if (dist < 0.1f)
                 {
-                    entity.Get<Mining>();
+                    _aspect.Mining.Add(index);
                 }
             }
             
-            foreach (var index in _mining)
+            foreach (var index in _aspect.MiningProcessMining)
             {
-                ref readonly var component = ref _mining.Get1(index);
-
-                var entity = _mining.GetEntity(index);
+                ref readonly var component = ref _aspect.MineProcess.Get(index);
                 
-                ref var health = ref component.ItemEntity.Get<Health>().value;
-                component.ItemEntity.Get<Health>().value -= 1 * _runtimeData.deltaTime;
+                component.ItemEntity.Unpack(_aspect.World(), out var itemEntity);
                 
-                component.ItemEntity.Get<OnChangeHealth>();
+                ref var health =  ref _aspect.Health.Get(itemEntity).value;
+                health -= 1 * _runtimeData.deltaTime;
+                
+                _aspect.OnChangeHealth.GetOrAdd(itemEntity, out _);
                 
                 if (health <= 0)
                 {
-                    entity.Get<CancelWork>();
+                    _aspect.CancelWork.Add(index);
                 }
             }
             
-            foreach (var index in _cancel)
+            foreach (var index in _aspect.MiningProcessCancel)
             {
-                ref var entity = ref _cancel.GetEntity(index);
-                entity.Del<MineProcess>();
-                entity.Del<Mining>();
+                _aspect.MineProcess.Del(index);
+                _aspect.Mining.Del(index);
             }
         }
     }

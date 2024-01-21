@@ -16,12 +16,14 @@ namespace PathFindingSystem
 
         private List<CellPFModel> _openList = new List<CellPFModel>(100);
         private List<CellPFModel> _closedList = new List<CellPFModel>(100);
+        
+        private List<CellPFModel> _search = new List<CellPFModel>(100);
 
         public PathFinding(IGrid gridPn) =>
             _gridPN = gridPn;
        
         
-        public List<CellPFModel> FindPath(Vector3 startPosition, Vector3 finishPosition)
+        public List<Vector3> FindPath(Vector3 startPosition, Vector3 finishPosition)
         {
             CellPFModel startCellPf = _gridPN.FromWorldToCell(startPosition);
             CellPFModel endCellPf = _gridPN.FromWorldToCell(finishPosition);
@@ -69,9 +71,7 @@ namespace PathFindingSystem
                 neighboursCells.Clear();
             }
             
-            var path = ListPool<CellPFModel>.Get();;
-            path.Add(endCellPf);
-            var cellPath = CalculatePath(path, endCellPf);
+            var cellPath = CalculatePath(_search, endCellPf);
                 
             ResettingIndicators(_openList);
             ResettingIndicators(_closedList);
@@ -108,12 +108,14 @@ namespace PathFindingSystem
             return neighboursCells;
         }
     
-        private List<CellPFModel> CalculatePath( List<CellPFModel> path, CellPFModel cell)
+        private List<Vector3> CalculatePath( List<CellPFModel> search, CellPFModel cell)
         {
+            var path = ListPool<Vector3>.Get();;
+            path.Add(cell.WorldPosition);
             CellPFModel currentNode = cell;
             while (currentNode.ComeFromCellPf != null)
             {
-                path.Add(currentNode.ComeFromCellPf);
+                path.Add(currentNode.ComeFromCellPf.WorldPosition);
                 currentNode = currentNode.ComeFromCellPf;
             }
 
