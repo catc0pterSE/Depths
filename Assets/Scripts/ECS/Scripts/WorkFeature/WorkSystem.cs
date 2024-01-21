@@ -63,45 +63,181 @@ namespace ECS.Scripts.WorkFeature
         private readonly RuntimeData _runtimeData;
         private readonly StaticData _staticData;
 
-        private readonly EcsFilter<Works>.Exclude<WorkProcess> _filter;
-        private readonly EcsFilter<MiningTag, Position>.Exclude<ItemPlaced> _items;
-       
-            
+        private readonly EcsFilter<Works, Position>.Exclude<WorkProcess, Path.Components.Path> _workers;
+        
+        private readonly EcsFilter<MiningTag, Position>.Exclude<ItemPlaced> _mining;
+           
         
         private Dictionary<WorkType, Func<bool>> _conditions;
+        
+        
+                      
+        [BurstCompile]
+        private struct DistanceJob : IJob
+        {
+            public NativeArray<WorkerData> Workers;
+            public NativeArray<DistanceData> Items;
+            
+            public float TotalDistance;
+            [BurstCompile]
+            public void Execute()
+            {
+                for (int indexWorker = 0; indexWorker < Workers.Length; indexWorker++)
+                {
+                    if (indexWorker >= Items.Length - 1)
+                    {
+                        break;
+                    }
+                    
+                    var worker = Workers[indexWorker];;
+                    TotalDistance = 100000;
+                        
+                    for (int indexItem = 0; indexItem < Items.Length; indexItem++)
+                    {
+                        var item = Items[indexItem];
+                        
+                        if(item.Exit) continue;
+                        
+                        var distanceTwo =  math.distancesq(item.PositionItem, worker.Position);
+                    
+                        if (TotalDistance > distanceTwo)
+                        {
+                            TotalDistance = distanceTwo;
+
+                            if (worker.ItemIndex > -1)
+                            {
+                                var oldItem = Items[worker.ItemIndex];
+                                oldItem.Exit = false;
+                                Items[worker.ItemIndex] = oldItem;
+                            }
+
+                            worker.ItemIndex = item.ItemIndex;
+                            
+                            worker.PositionItem = item.PositionItem;
+
+                            item.Exit = true;
+                                
+                            Items[indexItem] = item;
+                            Workers[indexWorker] = worker;
+                        }
+                    }
+                }
+            }
+        }
+        
+        public struct WorkerData
+        {
+            [ReadOnly]  public float3 Position;
+            [ReadOnly]  public int WorkerIndex;
+            
+            [WriteOnly] public float3 PositionItem;
+            [WriteOnly] public int ItemIndex;
+        }
+        public struct DistanceData
+        {
+            [ReadOnly] public float3 PositionItem;
+            [ReadOnly] public int ItemIndex;
+
+            [WriteOnly] public bool Exit;
+        }
+        
+        
+        
         
         public enum WorkType
         {
             FindItem,
+            Mining,
         }
 
         public void Init()
         {
             _conditions = new Dictionary<WorkType, Func<bool>>()
             {
-                [WorkType.FindItem] = () => !_items.IsEmpty(),
+                [WorkType.Mining] = () => !_mining.IsEmpty(),
             };
         }
         public void Run()
         {
-            foreach (var index in _filter)
+            foreach (var worker in _workers)
             {
-                ref var works = ref _filter.Get1(index);
-                
-                foreach (var work in works.value)
+                var work = _workers.Get1(worker);
+                foreach (var work1 in work.value)
                 {
-                    if (work.value.IsDone())
+                    if (work1.value.IsDone())
                     {
-                        ref var entity = ref _filter.GetEntity(index);
+                        var entity = _workers.GetEntity(worker);
                         
-                        work.value.GiveWork(entity);
+                        work1.value.GiveWork(entity);
 
                         entity.Get<WorkProcess>();
-                        
-                        break;
                     }
                 }
             }
+
+
+            // if (!_mining.IsEmpty())
+            // {
+            //
+            //     if(_workers.GetEntitiesCount() == 0) return;
+            //     
+            //     var distanceWorkers = new NativeArray<WorkerData>(_workers.GetEntitiesCount(), Allocator.TempJob);
+            //     var distanceItems = new NativeArray<DistanceData>(_mining.GetEntitiesCount(), Allocator.TempJob);
+            //     
+            //     for (int i = 0; i < distanceWorkers.Length; i++)
+            //     {
+            //
+            //         _workers.GetEntity(i).Get<TargetPath>().value = Vector3.zero;
+            //
+            //         var workerData = new WorkerData();
+            //         
+            //         workerData.PositionItem = _workers.Get2(i).value;
+            //         
+            //         workerData.WorkerIndex = i;
+            //         
+            //         workerData.ItemIndex = -1;
+            //         
+            //         distanceWorkers[i] = workerData;
+            //     }
+            //     
+            //     for (int i = 0; i < distanceItems.Length; i++)
+            //     {
+            //         var distanceData = new DistanceData();
+            //         
+            //         distanceData.PositionItem = _mining.Get2(i).value;
+            //         
+            //         distanceData.ItemIndex = i;
+            //         
+            //         distanceData.Exit = false;
+            //         
+            //         distanceItems[i] = distanceData;
+            //     }
+            //     
+            //     DistanceJob moveJob = new DistanceJob { Workers = distanceWorkers, Items = distanceItems, TotalDistance = 100000f};
+            //     
+            //     var jobHandle = moveJob.Schedule();
+            //     jobHandle.Complete();
+            //     
+            //     for (int i = 0; i < distanceWorkers.Length; i++)
+            //     {
+            //         var worker = distanceWorkers[i];
+            //         ref var entity = ref _workers.GetEntity(worker.WorkerIndex);
+            //         if (worker.ItemIndex > -1)
+            //         {
+            //             
+            //             ref var findEntity = ref _mining.GetEntity(worker.ItemIndex);
+            //             
+            //             findEntity.Get<ItemPlaced>();
+            //             
+            //             entity.Get<WorkProcess>();
+            //             entity.Get<MineProcess>().ItemEntity = findEntity;
+            //             entity.Get<TargetPath>().value = worker.PositionItem;
+            //         }
+            //     }
+            //     
+            //     distanceItems.Dispose();
+            //     distanceWorkers.Dispose();
+            // }
         }
         
     }

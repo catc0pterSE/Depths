@@ -10,6 +10,8 @@ namespace ECS.Scripts.Path.Systems
     public sealed class CreateMousePathSystem : IEcsRunSystem
     {
         private readonly EcsFilter<Unit, Position, Selected> _units;
+
+        private CameraController _controller;
         public void Run()
         {
             if (!Input.GetMouseButtonDown(1))
@@ -17,12 +19,15 @@ namespace ECS.Scripts.Path.Systems
                 return;
             }
 
-            var cameraRay = Object.FindFirstObjectByType<CameraController>();
+            if (_controller == null)
+            {
+                _controller = Object.FindFirstObjectByType<CameraController>();
+            }
 			
             foreach (var unitIndex in _units)
             {
                 ref var entity = ref _units.GetEntity(unitIndex);
-                entity.Get<TargetPath>().value = cameraRay.GetWorldPosition();
+                entity.Get<TargetPath>().value = _controller.GetWorldPosition();
             }
         }
     }

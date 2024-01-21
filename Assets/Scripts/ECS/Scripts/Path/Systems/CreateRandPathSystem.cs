@@ -26,7 +26,7 @@ namespace ECS.Scripts.Path.Systems
                 
                 if (randMove.time <= 0)
                 {
-                    randMove.time = Random.Range(1f, 2f);
+                    randMove.time = 0;
                     var randDirection = new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f));
                     
                     
