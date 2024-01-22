@@ -61,6 +61,10 @@ namespace ECS.Scripts.TestSystem
         private FindMineWork _findMineWork;
 
         [DI] private readonly MainAspect _aspect;
+        
+        [DI] private readonly StatAspect _statAspect;
+        
+        [DI] private readonly BodyAspect _bodyAspect;
 
         private int _i;
 
@@ -123,7 +127,7 @@ namespace ECS.Scripts.TestSystem
 
         private void CreateStats(ProtoEntity entityUnit)
         {
-            ref var stats = ref _aspect.Stats.Add(entityUnit);
+            ref var stats = ref _statAspect.Stats.Add(entityUnit);
             stats.value = new Dictionary<StatType, ProtoPackedEntity>();
 
 
@@ -135,12 +139,12 @@ namespace ECS.Scripts.TestSystem
 
 
                 var stat = new Stat();
-                stat.type = statData.Stat;
+                stat.type = statData.StatType;
                 stat.value = 10f;
                 
-                _aspect.Stat.Add(statEntity) = stat;
+                _statAspect.Stat.Add(statEntity) = stat;
                 
-                stats.value.Add(statData.Stat, _aspect.World().PackEntity(statEntity));
+                stats.value.Add(statData.StatType, _aspect.World().PackEntity(statEntity));
             }
         }
 
@@ -148,7 +152,7 @@ namespace ECS.Scripts.TestSystem
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         private void CreateBody(ProtoEntity entityUnit)
         {
-            ref var body = ref _aspect.Bodies.Add(entityUnit);
+            ref var body = ref _bodyAspect.Bodies.Add(entityUnit);
 
             body.parts = new Dictionary<BodyPart, ProtoPackedEntity>();
             foreach (var bodyPartData in _staticData.BodyPartsData)
@@ -156,12 +160,12 @@ namespace ECS.Scripts.TestSystem
                 var partEntity =  _aspect.World().NewEntity();
                 
                 _aspect.Health.Add(partEntity).value  = 100f;
-                _aspect.Parts.Add(partEntity).value   = bodyPartData.Part;
+                _bodyAspect.Parts.Add(partEntity).value   = bodyPartData.Part;
                 _aspect.Owners.Add(partEntity).value  = _aspect.World().PackEntity(entityUnit);
 
                 switch (bodyPartData.Part)
                 {
-                    case BodyPart.Head:  _aspect.Heads.Add(partEntity);
+                    case BodyPart.Head:  _bodyAspect.Heads.Add(partEntity);
                         break;
                 }
                 

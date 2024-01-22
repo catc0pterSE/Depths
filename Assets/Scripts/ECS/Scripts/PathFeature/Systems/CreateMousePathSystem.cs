@@ -21,6 +21,7 @@ namespace ECS.Scripts.PathFeature.Systems
         [DI] private readonly StaticData _staticData;
         
         [DI] private MainAspect _aspect;
+        [DI] private PathAspect _pathAspect;
 
         [DI] private readonly LevelPN _levelPn;
 
@@ -40,7 +41,7 @@ namespace ECS.Scripts.PathFeature.Systems
 			
             foreach (var unitIndex in _aspect.UnitsSelected)
             {
-                _aspect.TargetPath.Add(unitIndex).value = _controller.GetWorldPosition();
+                _pathAspect.TargetPoint.Add(unitIndex).value = _controller.GetWorldPosition();
             }
         }
     }

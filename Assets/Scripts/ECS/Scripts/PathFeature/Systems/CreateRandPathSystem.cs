@@ -14,6 +14,8 @@ namespace ECS.Scripts.PathFeature.Systems
         [DI] private LevelPN _levelPn;
         
         [DI] private readonly MainAspect _aspect;
+        
+        [DI] private PathAspect _pathAspect;
         public void Run()
         {
             
@@ -34,7 +36,7 @@ namespace ECS.Scripts.PathFeature.Systems
                         continue;
                     }
 
-                    _aspect.TargetPath.GetOrAdd(index, out _).value = position + randDirection;
+                    _pathAspect.TargetPoint.GetOrAdd(index, out _).value = position + randDirection;
                    
                 }
             }

@@ -101,7 +101,7 @@ namespace ECS.Scripts.WorkFeature
             
             _aspect.ItemsBusy.Add(findEntity);
             _aspect.MineProcess.Add(entity).ItemEntity = _aspect.World().PackEntity(findEntity);
-            _aspect.TargetPath.GetOrAdd(entity, out _).value = positionNativeOut[0].PositionItem;
+            _aspect.PathAspect.TargetPoint.GetOrAdd(entity, out _).value = positionNativeOut[0].PositionItem;
             
 
             positionNative.Dispose();
@@ -194,7 +194,7 @@ namespace ECS.Scripts.WorkFeature
             
             _aspect.ItemsBusy.Add(findEntity);
             _aspect.FindItemProcess.Add(entity).ItemEntity = _aspect.World().PackEntity(findEntity);
-            _aspect.TargetPath.GetOrAdd(entity, out _).value = positionNativeOut[0].PositionItem;
+            _aspect.PathAspect.TargetPoint.GetOrAdd(entity, out _).value = positionNativeOut[0].PositionItem;
             
 
             positionNative.Dispose();

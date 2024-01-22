@@ -13,7 +13,7 @@ namespace ECS.Scripts.PathFeature.Systems
 {
     public sealed class CreatePathSystem : IProtoRunSystem
     {
-        private readonly EcsFilter<Position, TargetPath> _units;
+        private readonly EcsFilter<Position, TargetPoint> _units;
 		
         [DI] private readonly LevelPN _levelPN;
         
@@ -22,18 +22,19 @@ namespace ECS.Scripts.PathFeature.Systems
         [DI] private readonly StaticData _staticData;
         
         [DI] private readonly MainAspect _aspect;
+        [DI] private PathAspect _pathAspect;
 
         public void Run()
         {
-            foreach (var unitIndex in _aspect.PathCreate)
+            foreach (var unitIndex in _pathAspect.PathCreate)
             {
     			
                 ref readonly var position = ref _aspect.Position.Get(unitIndex).value;
-                ref readonly var targetPosition = ref _aspect.TargetPath.Get(unitIndex).value;
+                ref readonly var targetPosition = ref _pathAspect.TargetPoint.Get(unitIndex).value;
           
-                if (_aspect.Path.Has(unitIndex))
+                if (_pathAspect.Path.Has(unitIndex))
                 {
-                    ref var path = ref _aspect.Path.Get(unitIndex);
+                    ref var path = ref _pathAspect.Path.Get(unitIndex);
                     
                     ListPool<Vector3>.Release(path.value);
                     
@@ -46,13 +47,13 @@ namespace ECS.Scripts.PathFeature.Systems
 
                     var findPath = _levelPN.FindPath(position, targetPosition);
                 
-                    ref var path = ref _aspect.Path.Add(unitIndex);
+                    ref var path = ref _pathAspect.Path.Add(unitIndex);
                     path.value = findPath;
                     path.index = findPath.Count - 1;
                 }
                 
                 
-                _aspect.TargetPath.Del(unitIndex);
+                _pathAspect.TargetPoint.Del(unitIndex);
             }
         }
     }

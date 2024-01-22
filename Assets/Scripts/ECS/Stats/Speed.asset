@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 802c4f213f474e08b89795a038430997, type: 3}
   m_Name: Speed
   m_EditorClassIdentifier: 
-  <Stat>k__BackingField: 2
+  <StatType>k__BackingField: 2
   <Icon>k__BackingField: {fileID: 0}

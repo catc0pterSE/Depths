@@ -7,4 +7,9 @@ namespace ECS.Scripts.WorkFeature
     {
         public ProtoPackedEntity ItemEntity;
     }
+    
+    public struct ItemWork
+    {
+        public ProtoPackedEntity ItemEntity;
+    }
 }

@@ -21,7 +21,7 @@ namespace ECS.Scripts.Boot
         {
             _entity = entity;
             _entity.Unpack(aspect.World(), out var unPackEntity);
-            var stats = aspect.Stats.Get(unPackEntity).value;
+            var stats = aspect.StatAspect.Stats.Get(unPackEntity).value;
 
             string description = "";
 			
@@ -29,14 +29,14 @@ namespace ECS.Scripts.Boot
             {
                 statEntity.Unpack(aspect.World(), out var unPackStatEntity);
                 
-                ref readonly var stat = ref aspect.Stat.Get(unPackStatEntity);
+                ref readonly var stat = ref aspect.StatAspect.Stat.Get(unPackStatEntity);
                 
                 description += stat.type + ": " + stat.TotalValue() + "\n";
             } 
 
             _unitWindow.SetStats(description);
 			
-            var parts = aspect.Bodies.Get(unPackEntity).parts;
+            var parts = aspect.BodyAspect.Bodies.Get(unPackEntity).parts;
 			
             description = "";
 			
@@ -44,7 +44,7 @@ namespace ECS.Scripts.Boot
             {
                 partEntity.Unpack(aspect.World(), out var unPackPartEntity);
                 
-                ref readonly var part = ref aspect.Parts.Get(unPackPartEntity);
+                ref readonly var part = ref aspect.BodyAspect.Parts.Get(unPackPartEntity);
                 ref readonly var health = ref aspect.Health.Get(unPackPartEntity);
                 description += part + ": " + health + "\n";
             } 

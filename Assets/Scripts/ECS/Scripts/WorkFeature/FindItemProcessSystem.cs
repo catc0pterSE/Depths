@@ -19,7 +19,7 @@ namespace ECS.Scripts.WorkFeature
         
         
         [DI] private readonly MainAspect _aspect;
-
+        [DI] private PathAspect _pathAspect;
         public void Run()
         {
             foreach (var index in _aspect.FindItemProcessGet)
@@ -44,7 +44,7 @@ namespace ECS.Scripts.WorkFeature
 
                     trItem.SetParent(trUnit);
                     
-                    _aspect.TargetPath.GetOrAdd(index, out _).value = new Vector3(5f, 5f);
+                    _pathAspect.TargetPoint.GetOrAdd(index, out _).value = new Vector3(5f, 5f);
                     _aspect.TargetDrop.GetOrAdd(index, out _).value = new Vector3(5f, 5f);
 
                 }
