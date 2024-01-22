@@ -16,76 +16,100 @@ using UnityEngine;
 
 namespace ECS.Scripts.Boot
 {
-	public sealed class MainAspect : ProtoAspectInject
+	public sealed class PathAspect : ProtoAspectInject
 	{
-		public ProtoPool<Head> Heads;
+		public readonly ProtoPool<PathFeature.Components.Path> Path;
 		
-		public ProtoPool<Owner> Owners;
-		public ProtoPool<Unit> Units;
-		public ProtoPool<Selected> Selected;
-		public ProtoPool<RandMove> RandMove;
+		public readonly ProtoPool<UpdatePath> UpdatePath;
 		
-		public ProtoPool<Direction> Direction;
-		public ProtoPool<TransformRef> Transforms;
-		public ProtoPool<Position> Position;
+		public readonly ProtoPool<TargetPoint> TargetPoint;
 		
-		public ProtoPool<PathFeature.Components.Path> Path;
-		public ProtoPool<UpdatePath> UpdatePath;
-		public ProtoPool<TargetPath> TargetPath;
-		
-		public ProtoPool<Health> Health;
-		public ProtoPool<OnChangeHealth> OnChangeHealth;
-		
-		public ProtoPool<Speed> Speed;
-		
-		public ProtoPool<Works> Works;
-		
-		public ProtoPool<Body> Bodies;
-		public ProtoPool<Part> Parts;
-		
-		public ProtoPool<Stats> Stats;
-		public ProtoPool<Stat> Stat;
-		
-		
-		public ProtoPool<DiedEvent> DiedsEvent;
-		
-		
-		public ProtoPool<WorkProcess> WorkProcess;
-		
-		
-		public ProtoPool<CancelWork> CancelWork;
-		
-		public readonly ProtoIt CancelWorkF = new(It.Inc<CancelWork>());
-		
-		public ProtoPool<ItemBusy> ItemsBusy;
-	
-		
-	
-		public readonly ProtoIt HeadsChangeHealth = new(It.Inc<Head, Health, OnChangeHealth>());
-		public readonly ProtoIt PartsChangeHealth = new(It.Inc<Part, Health, OnChangeHealth>());
-        
-		public readonly ProtoItExc SyncPosition = new(It.Inc<TransformRef, Position>(), It.Exc<Sync>());
-		
-		public readonly ProtoIt PathCreate = new(It.Inc<Position, TargetPath>());
+		public readonly ProtoIt PathCreate = new(It.Inc<Position, TargetPoint>());
 		
 		public readonly ProtoIt PathUpdate = new(It.Inc<Position, PathFeature.Components.Path, UpdatePath>());
 		
 		public readonly ProtoIt MovePath = new(It.Inc<Position, PathFeature.Components.Path>());
+	}
+	public sealed class StatAspect : ProtoAspectInject
+	{
+		public readonly ProtoPool<Stats> Stats;
 		
-		public readonly ProtoIt MoveDirection = new(It.Inc<Position, Direction, Speed>());
+		public readonly ProtoPool<Stat> Stat;
+		
+	} 
+	public sealed class BodyAspect : ProtoAspectInject
+	{
+		public readonly ProtoPool<Head> Heads;
+		
+		public readonly ProtoPool<Part> Parts;
+		
+		public readonly ProtoPool<Body> Bodies;
+		
+		public readonly ProtoIt HeadsChangeHealth = new(It.Inc<Head, Health, OnChangeHealth>());
+		
+		public readonly ProtoIt PartsChangeHealth = new(It.Inc<Part, Health, OnChangeHealth>());
+	}
+	
+	public sealed class MainAspect : ProtoAspectInject
+	{
+		public readonly PathAspect PathAspect;
+		public readonly BodyAspect BodyAspect;
+		public readonly StatAspect StatAspect;
+		
+		public ProtoPool<Owner> Owners;
+		
+		public ProtoPool<Unit> Units;
+		
+		public ProtoPool<Selected> Selected;
+		
+		public ProtoPool<RandMove> RandMove;
+		
+		
+		public readonly ProtoPool<Direction> Direction;
+		
+		public readonly ProtoPool<TransformRef> Transforms;
+		
+		public readonly ProtoPool<Position> Position;
+		
+		public readonly ProtoPool<Health> Health;
+		
+		public readonly ProtoPool<OnChangeHealth> OnChangeHealth;
+		
+		public readonly ProtoPool<Speed> Speed;
+		
+		public readonly ProtoPool<Works> Works;
+		
+		
+		// to do -> 
+		public readonly ProtoPool<FindWork> FindWork;
+		
+		public readonly ProtoPool<DiedEvent> DiedsEvent;
+		
+		public readonly ProtoPool<WorkProcess> WorkProcess;
+		
+		public readonly ProtoPool<CancelWork> CancelWork;
+		
+		public readonly ProtoIt CancelWorkF = new(It.Inc<CancelWork>());
+		
+		public readonly ProtoPool<ItemBusy> ItemsBusy;
+		
+        
+		public readonly ProtoItExc SyncPosition = new(It.Inc<TransformRef, Position>(), It.Exc<Sync>());
+		
+		//public readonly ProtoIt MoveDirection = new(It.Inc<Position, Direction, Speed>());
+		
+		public readonly ProtoIt MoveDirection = new (It.Inc<Position, Direction, Speed>());
 		
 		public readonly ProtoIt UnitsSelected = new(It.Inc<Unit>());
 		
 		public readonly ProtoItExc RandsMover = new (It.Inc<Position, RandMove>(), It.Exc<PathFeature.Components.Path, WorkProcess>());
 		
-        
 		
+		public readonly ProtoPool<Sync> Sync;
 		
-		public ProtoPool<Sync> Sync;
-		
-		public ProtoPool<MiningTag> MiningTag;
-		public ProtoPool<MineProcess> MineProcess;
-		public ProtoPool<Mining> Mining;
+		public readonly ProtoPool<MiningTag> MiningTag;
+		public readonly ProtoPool<MineProcess> MineProcess;
+		public readonly ProtoPool<Mining> Mining;
 		
 		
 		public readonly ProtoItExc MiningFree = new (It.Inc<MiningTag, Position>(), It.Exc<ItemBusy>());
@@ -99,13 +123,15 @@ namespace ECS.Scripts.Boot
 		public readonly ProtoIt MiningProcessCancel = new (It.Inc<MineProcess, CancelWork>());
 
 		
-		public ProtoPool<FindItemProcess> FindItemProcess;
+		public readonly ProtoPool<FindItemProcess> FindItemProcess;
 		
-		public ProtoPool<ItemInHand> ItemsInHand;
+		public readonly ProtoPool<ItemWork> ItemWork;
+		
+		public readonly ProtoPool<ItemInHand> ItemsInHand;
         
-		public ProtoPool<Item> Items;
+		public readonly ProtoPool<Item> Items;
         
-		public ProtoPool<TargetDrop> TargetDrop;
+		public readonly ProtoPool<TargetDrop> TargetDrop;
 		
 		public readonly ProtoItExc ItemsFree = new (It.Inc<Item, Position>(), It.Exc<ItemBusy>());
 		
@@ -117,6 +143,7 @@ namespace ECS.Scripts.Boot
 		
 		
 		public readonly ProtoItExc WorkersNotWorking = new (It.Inc<Works, Position>(), It.Exc<WorkProcess, PathFeature.Components.Path>());
+		public readonly ProtoItExc FindWorkF = new (It.Inc<FindWork, Position>(), It.Exc<WorkProcess, PathFeature.Components.Path>());
 		
 		
 	}

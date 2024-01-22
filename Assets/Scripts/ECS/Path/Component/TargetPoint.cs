@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace ECS.Scripts.Path.Component
 {
-    public struct TargetPath
+    public struct TargetPoint
     {
         public Vector3 value;
     }

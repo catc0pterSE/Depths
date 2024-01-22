@@ -8,9 +8,10 @@ namespace ECS.Scripts.TestSystem
     public sealed class BodyStateReactionSystem : IProtoRunSystem
     {
         [DI] private readonly MainAspect _aspect;
+        [DI] private readonly BodyAspect _bodyAspect;
         public void Run()
         {
-            foreach (var i in _aspect.HeadsChangeHealth)
+            foreach (var i in _bodyAspect.HeadsChangeHealth)
             {
                 ref var health = ref _aspect.Health.Get(i).value;
 
@@ -20,9 +21,9 @@ namespace ECS.Scripts.TestSystem
                 }
             }
             
-            foreach (var i in _aspect.PartsChangeHealth)
+            foreach (var i in _bodyAspect.PartsChangeHealth)
             {
-                ref var part = ref _aspect.Parts.Get(i).value;
+                ref var part = ref _bodyAspect.Parts.Get(i).value;
                 ref var health = ref _aspect.Health.Get(i).value;
                 
                 Debug.Log($"{part.ToString()} : {health}");

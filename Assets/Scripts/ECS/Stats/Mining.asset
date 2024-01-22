@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 802c4f213f474e08b89795a038430997, type: 3}
   m_Name: Mining
   m_EditorClassIdentifier: 
-  <Stat>k__BackingField: 1
+  <StatType>k__BackingField: 1
   <Icon>k__BackingField: {fileID: 0}

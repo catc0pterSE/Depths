@@ -15,12 +15,13 @@ namespace ECS.Scripts.PathFeature.Systems
     public sealed class CheckDistancePointInPathSystem : IProtoRunSystem
     {
         [DI] private MainAspect _aspect;
+        [DI] private PathAspect _pathAspect;
         public void Run()
         {
-            foreach (var index in _aspect.MovePath)
+            foreach (var index in _pathAspect.MovePath)
             {
                 ref var position = ref _aspect.Position.Get(index).value;
-                ref var points = ref _aspect.Path.Get(index);
+                ref var points = ref _pathAspect.Path.Get(index);
                 
                 var positionPoint = points.value[points.index];
                 
@@ -34,7 +35,7 @@ namespace ECS.Scripts.PathFeature.Systems
                         ListPool<Vector3>.Release(points.value);
                         
                         _aspect.Direction.Del(index);
-                        _aspect.Path.Del(index);
+                        _pathAspect.Path.Del(index);
                         
                         continue;
                     }
@@ -98,9 +99,11 @@ namespace ECS.Scripts.PathFeature.Systems
                 return;
             }
             
+            
             var positionNative = new NativeArray<MoveData>(countEntities, Allocator.TempJob);
             
             int count = 0;
+            
             foreach (var index in _aspect.MoveDirection)
             {
                 var MoveData = new MoveData();
@@ -125,6 +128,7 @@ namespace ECS.Scripts.PathFeature.Systems
             }
 
             positionNative.Dispose();
+            
         }
         
        
