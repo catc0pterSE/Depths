@@ -28,7 +28,7 @@ namespace ECS.Scripts.PathFeature.Systems
                 
                 if (randMove.time <= 0)
                 {
-                    randMove.time = 0;
+                    randMove.time = Random.Range(1f, 2f);
                     var randDirection = new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f));
                     
                     if (_levelPn.OutBounds(position + randDirection))

@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -22,12 +23,27 @@ public class Pathfinder : MonoBehaviour
     Hashtable obstacles;
     Node start, end;
     int safeGuard = 1000;
-    
+    private NativeHashMap<int2,bool> isObstacle;
+    private NativeHashMap<int2, Node> nodes;
+    private NativeArray<int2> offsets;
+    private NativeHashMap<int2,Node> openSet;
+
     void Start()
     {
         obstacles = new Hashtable();
         start = new Node { coord = int2.zero, parent = int2.zero, gScore = int.MaxValue, hScore = int.MaxValue };
         end = new Node { coord = int2.zero, parent = int2.zero, gScore = int.MaxValue, hScore = int.MaxValue };
+        
+        openSet =
+            new NativeHashMap<int2, Node>(safeGuard, Allocator.TempJob);
+        
+        isObstacle =
+            new NativeHashMap<int2, bool>(obstacles.Count, Allocator.TempJob);
+        nodes =
+            new NativeHashMap<int2, Node>(safeGuard, Allocator.TempJob);
+
+        offsets = 
+            new NativeArray<int2>(8, Allocator.TempJob);
     }
 
     // Update is called once per frame
@@ -37,21 +53,30 @@ public class Pathfinder : MonoBehaviour
         var start = new Node { coord = new int2(startPosition.x, startPosition.y), parent = int2.zero, gScore = int.MaxValue, hScore = int.MaxValue };
         var end = new Node { coord = new int2(finishPosition.x, finishPosition.y), parent = int2.zero, gScore = int.MaxValue, hScore = int.MaxValue };
         
-        NativeHashMap<int2, bool> isObstacle =
-            new NativeHashMap<int2, bool>(obstacles.Count, Allocator.TempJob);
-        NativeHashMap<int2, Node> nodes =
-            new NativeHashMap<int2, Node>(safeGuard, Allocator.TempJob);
+        // foreach (int2 o in obstacles.Keys)
+        // {
+        //     isObstacle.Add(o, true);
+        // }
+        // NativeHashMap<int2, Node> openSet =
+        //     new NativeHashMap<int2, Node>(safeGuard, Allocator.TempJob);
 
-        foreach (int2 o in obstacles.Keys)
-        {
-            isObstacle.Add(o, true);
-        }
+        offsets[0] = new int2(0, 1);
+        offsets[1] = new int2(1, 1);
+        offsets[2] = new int2(1, 0);
+        offsets[3] = new int2(1, -1);
+        offsets[4] = new int2(0, -1);
+        offsets[5] = new int2(-1, -1);
+        offsets[6] = new int2(-1, 0);
+        offsets[7] = new int2(-1, 1);
+        
 
         AStar aStar = new AStar
         {
             isObstacle = isObstacle,
             nodes = nodes,
             start = start,
+            openSet = openSet,
+            offsets = offsets,
             end = end,
             safeGuard = safeGuard
         };
@@ -59,7 +84,7 @@ public class Pathfinder : MonoBehaviour
         JobHandle handle = aStar.Schedule();
         handle.Complete();
 
-        NativeArray<Node> nodeArray = nodes.GetValueArray(Allocator.TempJob);
+        //NativeArray<Node> nodeArray = nodes.GetValueArray(Allocator.TempJob);
         
         
         List<Vector3> path = ListPool<Vector3>.Get();
@@ -78,9 +103,11 @@ public class Pathfinder : MonoBehaviour
         }
         
 
-        nodes.Dispose();
-        isObstacle.Dispose();
-        nodeArray.Dispose();
+        nodes.Clear();
+        isObstacle.Clear();
+
+        openSet.Clear();
+        //odeArray.Dispose();
 
 
         if (path.Count == 0)
@@ -90,14 +117,21 @@ public class Pathfinder : MonoBehaviour
         
         return path;
     }
-        
+    private void OnDestroy()
+    {
+        openSet.Dispose();
+        offsets.Dispose();
+        nodes.Dispose();
+        isObstacle.Dispose();
+    }
 
     [BurstCompile(CompileSynchronously = true)]
     public struct AStar : IJob
     {
         public NativeHashMap<int2, bool> isObstacle;
         public NativeHashMap<int2, Node> nodes;
-
+        public NativeHashMap<int2, Node> openSet;
+        public NativeArray<int2> offsets;
         public Node start;
         public Node end;
 
@@ -110,20 +144,7 @@ public class Pathfinder : MonoBehaviour
             current.gScore = 0;
             current.hScore = SquaredDistance(current.coord, end.coord);
             
-            NativeHashMap<int2, Node> openSet =
-                new NativeHashMap<int2, Node>(safeGuard, Allocator.Temp);
-            
             openSet.TryAdd(current.coord, current);
-            
-            NativeArray<int2> offsets = new NativeArray<int2>(8, Allocator.Temp);
-            offsets[0] = new int2(0, 1);
-            offsets[1] = new int2(1, 1);
-            offsets[2] = new int2(1, 0);
-            offsets[3] = new int2(1, -1);
-            offsets[4] = new int2(0, -1);
-            offsets[5] = new int2(-1, -1);
-            offsets[6] = new int2(-1, 0);
-            offsets[7] = new int2(-1, 1);
 
             int counter = 0;
 
@@ -165,9 +186,6 @@ public class Pathfinder : MonoBehaviour
                     break;
 
             } while (openSet.Count() != 0 && !current.coord.Equals(end.coord));
-
-            offsets.Dispose();
-            openSet.Dispose();
         }
 
         public int SquaredDistance(int2 coordA, int2 coordB)

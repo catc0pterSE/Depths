@@ -18,7 +18,7 @@ namespace ECS.Scripts.PathFeature.Systems
 
             if (sqdist == 0 || sqdist <= maxDistanceDelta * maxDistanceDelta)
                 return target;
-            var dist = math.sqrt(sqdist); // 25 5  1 / 5 * delta
+            var dist = math.sqrt(sqdist);
 
             dist = 1 / dist * maxDistanceDelta;
 

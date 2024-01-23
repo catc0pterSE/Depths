@@ -71,6 +71,7 @@ namespace ECS.Scripts.PathFeature.Systems
                 for (int i = 0; i < data.Length; i++)
                 {
                     var moveData = data[i]; 
+                    
                     moveData.result = moveData.position.MoveTowards(moveData.direction, moveData.speed * delta);
                     
                     data[i] = moveData;
