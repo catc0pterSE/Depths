@@ -1,19 +1,24 @@
 ﻿using System;
+using System.Collections.Generic;
+using ECS.Scripts.Boot;
+using Leopotam.EcsProto;
+using Leopotam.EcsProto.QoL;
 using UnityEngine;
 
 namespace Grid.Elements
 {
+    // edit pathfinding
+    // Cell add / remove / Get List<Entity>
+    // Method Obstacle return true;
     public class CellPFModel
     {
         private int _wayToFinalCell;
-
         public Vector3 WorldPosition { get; private set; }
         public Vector2Int GridPosition { get; private set; }
         public bool IsWalkable { get; private set; } = true;
         public CellPFModel ComeFromCellPf { get; private set; }
         public int TransitionCost { get; private set; } = int.MaxValue;
         public int TotalCost { get; private set; }
-
         public void SetComeFromCell(CellPFModel comeFromCellPf) => 
             ComeFromCellPf = comeFromCellPf;
 
