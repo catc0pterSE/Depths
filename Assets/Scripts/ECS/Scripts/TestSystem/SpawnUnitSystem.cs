@@ -98,9 +98,11 @@ namespace ECS.Scripts.TestSystem
                 _aspect.RandMove.Add(entityUnit);
                 
 
-                CreateBody(entityUnit);
+                //CreateBody(entityUnit);
 
-                CreateStats(entityUnit);
+                //CreateStats(entityUnit);
+                
+                _aspect.Speed.Add(entityUnit).value = 10f;
 
                 var findWork = new Work();
                 findWork.Order = 0;
