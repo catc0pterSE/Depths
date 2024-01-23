@@ -7,15 +7,13 @@ namespace Grid
     public class GridPN : IGrid
     {
         public CellPFModel[,] Map { get; }
-
+        
         public Vector2Int Size;
-
         public GridPN(Vector2Int size)
         {
             Size = size;
             Map = new CellPFModel[size.x, size.y];
         }
-
         public void Create()
         {
             for (var x = 0; x < Map.GetLength(0); x++)

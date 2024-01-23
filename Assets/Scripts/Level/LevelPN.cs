@@ -8,6 +8,12 @@ using UnityEngine.Tilemaps;
 
 namespace Level
 {
+    // to do -> 
+    
+    // LevelPN rename -> PathFindingService -> IPathFindingService
+    
+    // PathFinding -> IPathFinding
+    
     public class LevelPN : MonoBehaviour
     {
         [SerializeField] private Vector2Int _sizeGrid;

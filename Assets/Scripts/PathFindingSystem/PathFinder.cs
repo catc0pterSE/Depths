@@ -21,7 +21,6 @@ public class Pathfinder : MonoBehaviour
     }
 
     Hashtable obstacles;
-    Node start, end;
     int safeGuard = 1000;
     private NativeHashMap<int2,bool> isObstacle;
     private NativeHashMap<int2, Node> nodes;
@@ -31,8 +30,6 @@ public class Pathfinder : MonoBehaviour
     void Start()
     {
         obstacles = new Hashtable();
-        start = new Node { coord = int2.zero, parent = int2.zero, gScore = int.MaxValue, hScore = int.MaxValue };
-        end = new Node { coord = int2.zero, parent = int2.zero, gScore = int.MaxValue, hScore = int.MaxValue };
         
         openSet =
             new NativeHashMap<int2, Node>(safeGuard, Allocator.TempJob);
@@ -85,7 +82,6 @@ public class Pathfinder : MonoBehaviour
         handle.Complete();
 
         //NativeArray<Node> nodeArray = nodes.GetValueArray(Allocator.TempJob);
-        
         
         List<Vector3> path = ListPool<Vector3>.Get();
         

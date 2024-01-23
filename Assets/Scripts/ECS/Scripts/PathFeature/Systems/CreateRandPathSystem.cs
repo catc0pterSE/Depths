@@ -18,7 +18,6 @@ namespace ECS.Scripts.PathFeature.Systems
         [DI] private PathAspect _pathAspect;
         public void Run()
         {
-            
             foreach (var index in _aspect.RandsMover)
             {
                 ref var position = ref _aspect.Position.Get(index).value;
