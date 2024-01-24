@@ -2,7 +2,7 @@
 
 namespace Factory
 {
-    public interface IFactory <T> where T : MonoBehaviour
+    public interface IFactory <out T> where T : MonoBehaviour
     {
         T Create(Transform container);
     }

@@ -11,7 +11,7 @@ namespace ECS.Scripts.PathFeature.Systems
     {
         [DI] private RuntimeData _runtimeData;
 
-        [DI] private LevelPN _levelPn;
+        [DI] private PathFindingService _pathFindingService;
         
         [DI] private readonly MainAspect _aspect;
         
@@ -30,7 +30,7 @@ namespace ECS.Scripts.PathFeature.Systems
                     randMove.time = Random.Range(1f, 2f);
                     var randDirection = new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f));
                     
-                    if (_levelPn.OutBounds(position + randDirection))
+                    if (_pathFindingService.OutBounds(position + randDirection))
                     {
                         continue;
                     }

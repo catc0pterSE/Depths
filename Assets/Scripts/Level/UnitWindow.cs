@@ -1,7 +1,7 @@
 using TMPro;
 using UnityEngine;
 
-namespace ECS.Scripts.Boot
+namespace Level
 {
     public sealed class UnitWindow : MonoBehaviour
     {

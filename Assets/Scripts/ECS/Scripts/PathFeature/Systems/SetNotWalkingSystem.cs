@@ -6,12 +6,12 @@ namespace ECS.Scripts.PathFeature.Systems
 {
     public sealed class SetNotWalkingSystem : IProtoRunSystem
     {
-        private readonly LevelPN _levelPN;
+        private readonly PathFindingService _pathFindingService;
         public void Run()
         {
             if (Input.GetMouseButtonDown(0))
             {
-                _levelPN.SetNotWalkingNode();
+                _pathFindingService.SetNotWalkingNode();
             }
         }
     }

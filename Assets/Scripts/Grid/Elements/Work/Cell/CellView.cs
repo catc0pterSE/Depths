@@ -1,6 +1,6 @@
-﻿using UnityEngine;
+using UnityEngine;
 
-namespace Grid.Elements
+namespace Grid.Elements.Work.Cell
 {
     public class CellView : MonoBehaviour
     {
@@ -26,7 +26,7 @@ namespace Grid.Elements
             SetColor(DefaultColor);
         }
 
-        public void SetColor(Color color) =>
+        private void SetColor(Color color) =>
             _renderer.material.color = color;
     }
 }

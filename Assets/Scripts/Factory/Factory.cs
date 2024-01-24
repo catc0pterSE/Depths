@@ -1,5 +1,6 @@
 ﻿using Factory.Asset;
 using Grid.Elements;
+using Grid.Elements.Work.Cell;
 using UnityEngine;
 
 namespace Factory

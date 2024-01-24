@@ -55,7 +55,7 @@ namespace ECS.Scripts.PathFeature.Systems
         
         [DI] private MainAspect _aspect;
 
-        [DI] private readonly LevelPN _levelPn;
+        [DI] private readonly PathFindingService _pathFindingService;
 
         #region Jobs
         [BurstCompile]

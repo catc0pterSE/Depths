@@ -1,8 +1,7 @@
-using ECS.Scripts.TestSystem;
-using Leopotam.Ecs;
+using ECS.Scripts.Boot;
 using Leopotam.EcsProto.QoL;
 
-namespace ECS.Scripts.Boot
+namespace Level
 {
     public sealed class UnitPresenter
     {

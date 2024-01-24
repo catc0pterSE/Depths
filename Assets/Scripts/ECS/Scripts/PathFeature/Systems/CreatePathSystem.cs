@@ -15,7 +15,7 @@ namespace ECS.Scripts.PathFeature.Systems
     {
         private readonly EcsFilter<Position, TargetPoint> _units;
 		
-        [DI] private readonly LevelPN _levelPN;
+        [DI] private readonly PathFindingService _pathFindingService;
         
         [DI] private readonly SceneData _sceneData;
         [DI] private readonly RuntimeData _runtimeData;
@@ -38,14 +38,14 @@ namespace ECS.Scripts.PathFeature.Systems
                     
                     ListPool<Vector3>.Release(path.value);
                     
-                    var findPath = _levelPN.FindPath(position, targetPosition);
+                    var findPath = _pathFindingService.FindPath(position, targetPosition);
                     path.value = findPath;
                     path.index = findPath.Count - 1;
                 }
                 else
                 {
 
-                    var findPath = _levelPN.FindPath(position, targetPosition);
+                    var findPath = _pathFindingService.FindPath(position, targetPosition);
                 
                     ref var path = ref _pathAspect.Path.Add(unitIndex);
                     path.value = findPath;
