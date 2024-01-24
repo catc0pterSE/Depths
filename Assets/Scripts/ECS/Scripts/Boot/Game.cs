@@ -20,6 +20,7 @@ namespace ECS.Scripts.Boot
         [SerializeField] private SceneData _sceneData;
 		[SerializeField] private RuntimeData _runtimeData;
 		[SerializeField] private StaticData _staticData;
+		[SerializeField] private SpatialHash _spatialHash;
 		[FormerlySerializedAs("_levelPn")] [SerializeField] private PathFindingService pathFindingService;
 		
 		[SerializeField] private UnitWindow _window;
@@ -31,6 +32,8 @@ namespace ECS.Scripts.Boot
 
             _world = new ProtoWorld(new MainAspect());
             _systems = new ProtoSystems(_world);
+
+            _spatialHash = new SpatialHash(pathFindingService.Grid);
 
 // #if UNITY_EDITOR
 //             Leopotam.Ecs.UnityIntegration.EcsWorldObserver.Create(_world);
@@ -53,6 +56,8 @@ namespace ECS.Scripts.Boot
 	            .AddSystem(new CreateRandPathSystem())
 	            
 	            .AddSystem(new SelectionSystem())
+	            .AddSystem(new SelectedViewEventSystem())
+	            .AddSystem(new SelectedEventSystem())
 	            
 	            // start work
                 
@@ -80,6 +85,7 @@ namespace ECS.Scripts.Boot
 	            .AddService(_sceneData)
 	            .AddService(_runtimeData)
 	            .AddService(_staticData)
+	            .AddService(_spatialHash)
 	            .AddService(_selectionView)
 	            .AddService(pathFindingService)
 

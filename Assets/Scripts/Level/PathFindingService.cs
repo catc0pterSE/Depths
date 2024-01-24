@@ -6,6 +6,7 @@ using Grid.Elements.Work.Cell;
 using PathFindingSystem;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using Pathfinder = PathFindingSystem.Pathfinder;
 
 namespace Level
 {
@@ -26,10 +27,12 @@ namespace Level
         public IPathFinding _finder;
         private List<Vector3> _path;
 
+        public IGrid Grid => _grid;
         private void Awake()
         {
             _grid = new GridPN(_sizeGrid, _tilemap, _tileBase);
             _pathFinding = new PathFinding(_grid);
+            _finder = Object.FindObjectOfType<Pathfinder>();
         }
 
         private void Start() =>

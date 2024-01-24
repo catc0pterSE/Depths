@@ -9,7 +9,7 @@ namespace Grid.Elements.Work.Cell
 {
     public class CellPFModel
     {
-        private List<ProtoPackedEntity> _entities;
+        private List<ProtoPackedEntity> _entities = new List<ProtoPackedEntity>(10);
         private int _wayToFinalCell;
         public Vector3 WorldPosition { get; private set; }
         public Vector2Int GridPosition { get; private set; }

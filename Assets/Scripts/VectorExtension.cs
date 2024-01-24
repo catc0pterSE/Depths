@@ -11,7 +11,9 @@ namespace DefaultNamespace
         public static Vector3Int ToVector3(this Vector2Int position) => 
             new(position.x, position.y, 0);
         
-        public static Vector2Int WorldPositionToCellPosition(this Vector3 position) => 
+        public static Vector2Int FloorPosition(this Vector3 position) => 
+            new(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y));
+        public static Vector2Int RoundPosition(this Vector3 position) => 
             new(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
     }
 }

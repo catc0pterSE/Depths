@@ -77,7 +77,7 @@ namespace ECS.Scripts.TestSystem
                 return;
             }
 
-            int count = 100;
+            int count = 1;
 
             while (count > 0)
             {

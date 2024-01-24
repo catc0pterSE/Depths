@@ -28,8 +28,6 @@ namespace ECS.Scripts.PathFeature.Systems
         {
             foreach (var unitIndex in _pathAspect.CreatePathIt)
             {
-                var packedEntity = _aspect.World().PackEntity(unitIndex);
-                
                 ref readonly var createPath = ref _pathAspect.CreatePath.Get(unitIndex);
           
                 if (_pathAspect.Path.Has(unitIndex))

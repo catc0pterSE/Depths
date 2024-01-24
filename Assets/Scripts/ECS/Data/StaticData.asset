@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fab3ea67cd544221956ad76003d715d4, type: 3}
   m_Name: StaticData
   m_EditorClassIdentifier: 
+  <PrefabSelect>k__BackingField: {fileID: 7497021080064675292, guid: a102252d349351b4aa4e8d2db18aad59, type: 3}
   <UnitPrefab>k__BackingField: {fileID: 8069450273526439535, guid: f3810531cade5eb459ef1915d0739bd6, type: 3}
   <ItemPrefab>k__BackingField: {fileID: 1704530551043408017, guid: 71cbd675bc01eed4cbcfd19401ebe8ce, type: 3}
   <MinePrefab>k__BackingField: {fileID: 6867998251614753363, guid: 7ac7f3b9f5ca72c44a74f7f5da3dd788, type: 3}
