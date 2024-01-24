@@ -43,8 +43,13 @@ namespace ECS.Scripts.WorkFeature
                     var trUnit = _aspect.Transforms.Get(index).value;;
 
                     trItem.SetParent(trUnit);
+                          
+                    ref var createPath = ref _aspect.PathAspect.CreatePath.GetOrAdd(index, out _);
+            
+                    createPath.start = position;
+                    createPath.end = new Vector3(5f, 5f);
                     
-                    _pathAspect.TargetPoint.GetOrAdd(index, out _).value = new Vector3(5f, 5f);
+                    
                     _aspect.TargetDrop.GetOrAdd(index, out _).value = new Vector3(5f, 5f);
 
                 }

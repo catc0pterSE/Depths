@@ -13,7 +13,7 @@ namespace ECS.Scripts.PathFeature.Systems
 {
     public sealed class CreatePathSystem : IProtoRunSystem
     {
-        private readonly EcsFilter<Position, TargetPoint> _units;
+        private readonly EcsFilter<Position, CreatePath> _units;
 		
         [DI] private readonly PathFindingService _pathFindingService;
         
@@ -26,11 +26,11 @@ namespace ECS.Scripts.PathFeature.Systems
 
         public void Run()
         {
-            foreach (var unitIndex in _pathAspect.PathCreate)
+            foreach (var unitIndex in _pathAspect.CreatePathIt)
             {
-    			
-                ref readonly var position = ref _aspect.Position.Get(unitIndex).value;
-                ref readonly var targetPosition = ref _pathAspect.TargetPoint.Get(unitIndex).value;
+                var packedEntity = _aspect.World().PackEntity(unitIndex);
+                
+                ref readonly var createPath = ref _pathAspect.CreatePath.Get(unitIndex);
           
                 if (_pathAspect.Path.Has(unitIndex))
                 {
@@ -38,14 +38,14 @@ namespace ECS.Scripts.PathFeature.Systems
                     
                     ListPool<Vector3>.Release(path.value);
                     
-                    var findPath = _pathFindingService.FindPath(position, targetPosition);
+                    var findPath = _pathFindingService.FindPath(createPath.start, createPath.end);
                     path.value = findPath;
                     path.index = findPath.Count - 1;
                 }
                 else
                 {
 
-                    var findPath = _pathFindingService.FindPath(position, targetPosition);
+                    var findPath = _pathFindingService.FindPath(createPath.start, createPath.end);
                 
                     ref var path = ref _pathAspect.Path.Add(unitIndex);
                     path.value = findPath;
@@ -53,7 +53,7 @@ namespace ECS.Scripts.PathFeature.Systems
                 }
                 
                 
-                _pathAspect.TargetPoint.Del(unitIndex);
+                _pathAspect.CreatePath.Del(unitIndex);
             }
         }
     }

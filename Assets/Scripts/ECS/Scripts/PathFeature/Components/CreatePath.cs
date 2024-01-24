@@ -2,9 +2,10 @@ using UnityEngine;
 
 namespace ECS.Scripts.Path.Component
 {
-    public struct TargetPoint
+    public struct CreatePath
     {
-        public Vector3 value;
+        public Vector3 start;
+        public Vector3 end;
     }
     
     public struct TargetDrop
