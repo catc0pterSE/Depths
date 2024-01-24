@@ -65,6 +65,8 @@ namespace ECS.Scripts.TestSystem
         [DI] private readonly StatAspect _statAspect;
         
         [DI] private readonly BodyAspect _bodyAspect;
+        
+        [DI] private readonly SelectionAspect _selectionAspect;
 
         private int _i;
 
@@ -88,13 +90,12 @@ namespace ECS.Scripts.TestSystem
                 
                 
                 var entityUnit = _aspect.World().NewEntity();
-
-
+                
                 _aspect.Units.Add(entityUnit);
                 _aspect.Transforms.Add(entityUnit).value = instanceObject.transform;
                 _aspect.Position.Add(entityUnit).value = pos;
                 
-                _aspect.Selected.Add(entityUnit);
+                _selectionAspect.CanSelect.Add(entityUnit);
                 _aspect.RandMove.Add(entityUnit);
                 
 

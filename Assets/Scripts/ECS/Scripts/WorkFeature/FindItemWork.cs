@@ -101,7 +101,11 @@ namespace ECS.Scripts.WorkFeature
             
             _aspect.ItemsBusy.Add(findEntity);
             _aspect.MineProcess.Add(entity).ItemEntity = _aspect.World().PackEntity(findEntity);
-            _aspect.PathAspect.TargetPoint.GetOrAdd(entity, out _).value = positionNativeOut[0].PositionItem;
+            
+            ref var createPath = ref _aspect.PathAspect.CreatePath.GetOrAdd(entity, out _);
+            
+            createPath.start = position;
+            createPath.end = positionNativeOut[0].PositionItem;
             
 
             positionNative.Dispose();
@@ -194,8 +198,11 @@ namespace ECS.Scripts.WorkFeature
             
             _aspect.ItemsBusy.Add(findEntity);
             _aspect.FindItemProcess.Add(entity).ItemEntity = _aspect.World().PackEntity(findEntity);
-            _aspect.PathAspect.TargetPoint.GetOrAdd(entity, out _).value = positionNativeOut[0].PositionItem;
+
+            ref var createPath = ref _aspect.PathAspect.CreatePath.GetOrAdd(entity, out _);
             
+            createPath.start = position;
+            createPath.end = positionNativeOut[0].PositionItem;
 
             positionNative.Dispose();
             positionNativeOut.Dispose();

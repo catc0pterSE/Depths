@@ -29,13 +29,18 @@ namespace ECS.Scripts.PathFeature.Systems
                 {
                     randMove.time = Random.Range(1f, 2f);
                     var randDirection = new Vector3(Random.Range(-5f, 5f), Random.Range(-5f, 5f));
+
+                    var pathEnd = position + randDirection;
                     
-                    if (_pathFindingService.OutBounds(position + randDirection))
+                    if (_pathFindingService.OutBounds(pathEnd))
                     {
                         continue;
                     }
 
-                    _pathAspect.TargetPoint.GetOrAdd(index, out _).value = position + randDirection;
+                    ref var createPath = ref _pathAspect.CreatePath.GetOrAdd(index, out _);
+                    
+                    createPath.start = position;
+                    createPath.end = pathEnd;
                    
                 }
             }

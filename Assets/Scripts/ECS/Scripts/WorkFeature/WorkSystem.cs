@@ -140,8 +140,12 @@ namespace ECS.Scripts.WorkFeature
                 _mainAspect.ItemsBusy.Add(findEntity);
                 _mainAspect.ItemWork.Add(entity).ItemEntity = _mainAspect.World().PackEntity(findEntity);
                 
-                _mainAspect.PathAspect.TargetPoint.GetOrAdd(entity, out _).value = positionNativeOut[0].PositionItem;
-
+              
+                ref var createPath = ref _mainAspect.PathAspect.CreatePath.GetOrAdd(entity, out _);
+            
+                createPath.start = position;
+                createPath.end = positionNativeOut[0].PositionItem;
+                
                 positionNative.Dispose();
                 positionNativeOut.Dispose();
                 

@@ -13,7 +13,7 @@ namespace ECS.Scripts.PathFeature.Systems
 {
     public sealed class CreateMousePathSystem : IProtoRunSystem
     {
-        private readonly EcsFilter<Unit, Position, Selected> _units;
+        private readonly EcsFilter<Unit, Position, CanSelect> _units;
 
         
         [DI] private readonly SceneData _sceneData;
@@ -41,7 +41,9 @@ namespace ECS.Scripts.PathFeature.Systems
 			
             foreach (var unitIndex in _aspect.UnitsSelected)
             {
-                _pathAspect.TargetPoint.Add(unitIndex).value = _controller.GetWorldPosition();
+                ref var createPath = ref _pathAspect.CreatePath.Add(unitIndex);
+                createPath.start = _aspect.Position.Get(unitIndex).value;
+                createPath.end = _controller.GetWorldPosition();
             }
         }
     }

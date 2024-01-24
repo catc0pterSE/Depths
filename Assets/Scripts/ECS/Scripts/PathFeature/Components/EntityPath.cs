@@ -6,7 +6,7 @@ namespace ECS.Scripts.PathFeature.Components
     public struct UpdatePath
     {
     }
-    public struct Path
+    public struct EntityPath
     {
         public int index;
         public List<Vector3> value;
