@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace ECS.Scripts.GeneralComponents
 {
     public struct CanSelect
@@ -5,6 +7,11 @@ namespace ECS.Scripts.GeneralComponents
     }
     public struct SelectedEvent
     {
+    }
+    
+    public struct SelectedView
+    {
+        public Transform value;
     }
     public struct Selected
     {

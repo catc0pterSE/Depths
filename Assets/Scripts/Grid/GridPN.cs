@@ -42,21 +42,33 @@ namespace Grid
             Map[position.x, position.y];
 
         public CellPFModel FromWorldToCell(Vector3 position) => 
-            GetCell(position.WorldPositionToCellPosition());
+            GetCell(position.FloorPosition());
 
         public bool TryGetCell(Vector3 position, out CellPFModel cell)
         {
-            if (TryGetCell(position.WorldPositionToCellPosition(), out cell))
+            if (TryGetCell(position.FloorPosition(), out cell))
                 return true;
 
             return false;
         }
 
-        public bool OutBounds(Vector3 position) =>
-            position.WorldPositionToCellPosition().x >= Size.x ||
-            position.WorldPositionToCellPosition().y >= Size.y || 
-            position.WorldPositionToCellPosition().x < 0 ||
-            position.WorldPositionToCellPosition().y < 0;
+        public Vector3 ClampPosition(Vector3 position)
+        {
+            position.x = Mathf.Clamp(position.x, 0, Size.x);
+            position.y =  Mathf.Clamp(position.y, 0, Size.y);
+            
+            Debug.Log(position);
+            return position;   
+        }
+        public bool OutBounds(Vector3 position)
+        {
+            var floorPosition = position.FloorPosition();
+            
+            return floorPosition.x > Size.x ||
+                   floorPosition.y > Size.y ||
+                   floorPosition.x < 0 ||
+                   floorPosition.y < 0;
+        }
 
         public bool OutBounds(Vector2Int gridPosition) => 
             gridPosition.x >= Size.x || gridPosition.y >= Size.y || gridPosition.x < 0 || gridPosition.y < 0;

@@ -15,10 +15,16 @@ namespace ECS.Scripts.Boot
 		public ProtoPool<CanSelect> CanSelect;
         
 		public ProtoPool<Selected> Selected;
+		
+		public ProtoPool<SelectedView> SelectedView;
         
 		public ProtoPool<SelectedEvent> SelectedEvent;
         
-		public readonly ProtoIt SelectedEventIt = new (It.Inc<SelectedEvent>());
+		public readonly ProtoIt SelectedUnitsEvent = new (It.Inc<SelectedEvent>());
+		
+		public readonly ProtoIt SelectedUnitViewsOn = new (It.Inc<SelectedEvent, TransformRef>());
+		
+		public readonly ProtoIt SelectedViewIt = new (It.Inc<SelectedView>());
         
 		public readonly ProtoIt SelectedIt = new (It.Inc<Selected>());
 	}

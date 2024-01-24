@@ -7,6 +7,7 @@ using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
 using Unity.Mathematics;
+using UnityEngine;
 
 namespace ECS.Scripts.PathFeature.Systems
 {
@@ -15,6 +16,8 @@ namespace ECS.Scripts.PathFeature.Systems
         [DI] private readonly SceneData _sceneData;
         [DI] readonly RuntimeData _runtimeData;
         [DI] private readonly StaticData _staticData;
+        
+        [DI] private readonly SpatialHash _spatialHash;
 
         
         [DI] private MainAspect _aspect;
@@ -85,11 +88,16 @@ namespace ECS.Scripts.PathFeature.Systems
             MoveJob moveJob = new MoveJob() { delta = _runtimeData.deltaTime, data = positionNative };
             
             moveJob.Schedule().Complete();
-            
+
+            var world = _aspect.World();
             for (int i = 0; i < positionNative.Length; i++)
             {
                 var moveData = positionNative[i];
                 _aspect.Position.Get(moveData.Id).value = moveData.result;
+
+                var packedEntity = world.PackEntity(moveData.Id);
+                
+                _spatialHash.UpdatePosition(packedEntity, moveData.result);
             }
 
             positionNative.Dispose();
