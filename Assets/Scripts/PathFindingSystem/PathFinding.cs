@@ -1,29 +1,29 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using Grid;
 using Grid.Elements;
+using Grid.Elements.Work.Cell;
 using UnityEngine;
 using UnityEngine.Pool;
 
 namespace PathFindingSystem
 {
-    public class PathFinding
+    public class PathFinding : IPathFinding
     {
         private const int MoveStraightCost = 10;
         private const int MoveDiagonalCost = 14;
 
         private readonly IGrid _gridPN;
 
-        private List<CellPFModel> _openList = new List<CellPFModel>(100);
-        private List<CellPFModel> _closedList = new List<CellPFModel>(100);
+        private readonly List<CellPFModel> _openList = new List<CellPFModel>(100);
+        private readonly List<CellPFModel> _closedList = new List<CellPFModel>(100);
         
-        private List<CellPFModel> _search = new List<CellPFModel>(100);
+        private readonly List<CellPFModel> _search = new List<CellPFModel>(100);
 
         public PathFinding(IGrid gridPn) =>
             _gridPN = gridPn;
        
         
-        public List<Vector3> FindPath(Vector3 startPosition, Vector3 finishPosition)
+        public List<Vector3> FindPath(Vector3Int startPosition, Vector3Int finishPosition)
         {
             CellPFModel startCellPf = _gridPN.FromWorldToCell(startPosition);
             CellPFModel endCellPf = _gridPN.FromWorldToCell(finishPosition);
@@ -49,7 +49,7 @@ namespace PathFindingSystem
                     if (_closedList.Contains(neighbourCell))
                         continue;
 
-                    if (neighbourCell.IsWalkable == false)
+                    if (neighbourCell.Obstacle == false)
                     {
                         _closedList.Add(neighbourCell);
                         continue;
@@ -119,12 +119,8 @@ namespace PathFindingSystem
                 currentNode = currentNode.ComeFromCellPf;
             }
 
-            // path.Reverse();
             return path;
         }
-
-        // private CellPFModel GetLowestTotalCostNode(IReadOnlyCollection<CellPFModel> openList) => 
-        //     openList.FirstOrDefault(element => element.TotalCost == openList.Min(element => element.TotalCost));
 
         private CellPFModel GetLowestTotalCostNode(List<CellPFModel> openList)
         {

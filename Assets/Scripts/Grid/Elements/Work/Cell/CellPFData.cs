@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Tilemaps;
 
-namespace Grid.Elements
+namespace Grid.Elements.Work.Cell
 {
     [CreateAssetMenu(menuName = "Element Game", fileName = "CellPFData", order = 0)]
     public class CellPFData : ScriptableObject

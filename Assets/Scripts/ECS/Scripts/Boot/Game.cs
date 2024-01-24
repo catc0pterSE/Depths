@@ -13,6 +13,7 @@ using Leopotam.EcsProto;
 using Leopotam.EcsProto.QoL;
 using Level;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace ECS.Scripts.Boot
 {
@@ -157,7 +158,7 @@ namespace ECS.Scripts.Boot
         [SerializeField] private SceneData _sceneData;
 		[SerializeField] private RuntimeData _runtimeData;
 		[SerializeField] private StaticData _staticData;
-		[SerializeField] private LevelPN _levelPn;
+		[FormerlySerializedAs("_levelPn")] [SerializeField] private PathFindingService pathFindingService;
 		
 		[SerializeField] private UnitWindow _window;
 
@@ -214,7 +215,7 @@ namespace ECS.Scripts.Boot
 	            .AddService(_sceneData)
 	            .AddService(_runtimeData)
 	            .AddService(_staticData)
-	            .AddService(_levelPn)
+	            .AddService(pathFindingService)
 
 	            .Init();
 

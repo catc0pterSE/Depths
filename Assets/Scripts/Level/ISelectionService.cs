@@ -1,8 +1,8 @@
 using System;
-using Leopotam.Ecs;
+using ECS.Scripts.Boot;
 using Leopotam.EcsProto.QoL;
 
-namespace ECS.Scripts.Boot
+namespace Level
 {
     public interface ISelectionService
     {

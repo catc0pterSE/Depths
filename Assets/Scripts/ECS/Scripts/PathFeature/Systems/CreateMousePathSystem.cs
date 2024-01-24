@@ -23,7 +23,7 @@ namespace ECS.Scripts.PathFeature.Systems
         [DI] private MainAspect _aspect;
         [DI] private PathAspect _pathAspect;
 
-        [DI] private readonly LevelPN _levelPn;
+        [DI] private readonly PathFindingService _pathFindingService;
 
         
         private CameraController _controller;
