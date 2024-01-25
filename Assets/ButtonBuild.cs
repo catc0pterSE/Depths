@@ -20,8 +20,6 @@ public class ButtonBuild : MonoBehaviour
 
     private void CreateBuild()
     {
-        Debug.Log("55555");
-        
         var wall = Instantiate(wallPrefab);
         
         var entity = _mainAspect.World().NewEntity();
