@@ -21,16 +21,21 @@ namespace ECS.Scripts.Boot
 		[SerializeField] private RuntimeData _runtimeData;
 		[SerializeField] private StaticData _staticData;
 		[SerializeField] private SpatialHash _spatialHash;
-		[FormerlySerializedAs("_levelPn")] [SerializeField] private PathFindingService pathFindingService;
+		[SerializeField] private PathFindingService pathFindingService;
 		
 		[SerializeField] private UnitWindow _window;
 		[SerializeField] private SelectionView _selectionView;
+
+		[SerializeField] private ButtonBuild _button;
 
         IEnumerator Start()
         {
             // void can be switched to IEnumerator for support coroutines.
 
-            _world = new ProtoWorld(new MainAspect());
+            var mainAspect = new MainAspect();
+            
+            _button.Construct(mainAspect);
+            _world = new ProtoWorld(mainAspect);
             _systems = new ProtoSystems(_world);
 
             _spatialHash = new SpatialHash(pathFindingService.Grid);
@@ -59,6 +64,7 @@ namespace ECS.Scripts.Boot
 	            .AddSystem(new SelectedViewEventSystem())
 	            .AddSystem(new SelectedEventSystem())
 	            
+	            .AddSystem(new BuildSystem())
 	            // start work
                 
 	            .AddSystem(new WorkSystem())
