@@ -18,6 +18,7 @@ namespace ECS.Scripts.TestSystem
                 var buildWall = _mainAspect.Build.Get(entity);
                 var mouseWorldPosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
 
+                mouseWorldPosition.z = 0f;
                 buildWall.transform.position = mouseWorldPosition;
 
                 if (Input.GetMouseButtonUp(0))
@@ -34,6 +35,8 @@ namespace ECS.Scripts.TestSystem
 
                     var packedEntity = _mainAspect.World().PackEntity(entity);
                     cell.AddEntity(packedEntity);
+
+                    buildWall.transform.position = cell.WorldPosition;
                     
                     _mainAspect.Build.Del(entity);
                 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using ECS.Scripts.Data;
 using ECS.Scripts.PathFeature.Systems;
@@ -27,8 +28,7 @@ namespace ECS.Scripts.Boot
 		[SerializeField] private SelectionView _selectionView;
 
 		[SerializeField] private ButtonBuild _button;
-
-        IEnumerator Start()
+		IEnumerator Start()
         {
             // void can be switched to IEnumerator for support coroutines.
 
