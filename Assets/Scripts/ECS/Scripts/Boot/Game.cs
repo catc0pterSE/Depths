@@ -48,6 +48,8 @@ namespace ECS.Scripts.Boot
             _runtimeData = new RuntimeData();
 
 
+            _selectionView.Construct(mainAspect);
+            
             ISelectionService selectionService = new SelectionService();
             UnitPresenter presenter = new UnitPresenter(selectionService, _window);
             _systems

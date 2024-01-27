@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using DefaultNamespace;
 using ECS.Scripts.Boot;
 using ECS.Scripts.CharacterComponent;
 using ECS.Scripts.Data;
@@ -21,6 +22,7 @@ namespace ECS.Scripts.TestSystem
     {
         [DI]private readonly StaticData _staticData;
         [DI] private readonly MainAspect _aspect;
+        [DI] private readonly PathFindingService _path;
 
         public void Run()
         {
@@ -39,14 +41,17 @@ namespace ECS.Scripts.TestSystem
                 
                 
                 _aspect.MiningTag.Add(entityUnit);
+                _aspect.SelectionAspect.CanSelect.Add(entityUnit);
                 _aspect.Health.Add(entityUnit).value = 5f;
                 _aspect.Transforms.Add(entityUnit).value = instanceObject.transform;
                 
-                var pos =  new Vector3(Random.Range(0f, 100f), Random.Range(0f, 100f));
-                pos.x = MathF.Round(pos.x);
-                pos.y = MathF.Round(pos.y);
-                _aspect.Position.Add(entityUnit).value = pos;
+                var pos =  new Vector3(Random.Range(0f, 100f), Random.Range(0f, 100f)).FloorPosition();
+                _aspect.Position.Add(entityUnit).value = new Vector3(pos.x, pos.y);
 
+                var packedEntity = _aspect.World().PackEntity(entityUnit);
+                
+                _path.Grid.Map[pos.x, pos.y].AddEntity(packedEntity);
+                
                 count--;
             }
         }

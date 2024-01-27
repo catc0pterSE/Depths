@@ -10,6 +10,7 @@ using Level;
 using Unity.VisualScripting;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace ECS.Scripts.PathFeature.Systems
 {
@@ -65,7 +66,7 @@ namespace ECS.Scripts.PathFeature.Systems
 
         public void Run()
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
             {
                 _startPos = Input.mousePosition;
                 
@@ -82,16 +83,18 @@ namespace ECS.Scripts.PathFeature.Systems
                     Object.Destroy(tr.gameObject);
                     _selectionAspect.SelectedView.Del(protoEntity);
                 }
+                
+                _startSelected = true;
             }
 
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0) && _startSelected)
             {
                 _endPos = Input.mousePosition;
                 
                 _selectionView.SetScreen(_startPos, _endPos);
             }
             
-            if (Input.GetMouseButtonUp(0))
+            if (Input.GetMouseButtonUp(0) && _startSelected)
             {
                 
                 _selectionView.gameObject.SetActive(false);

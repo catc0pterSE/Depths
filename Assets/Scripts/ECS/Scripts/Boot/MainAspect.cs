@@ -19,13 +19,20 @@ namespace ECS.Scripts.Boot
 
         public ProtoPool<SelectedEvent> SelectedEvent;
 
-        public readonly ProtoIt SelectedUnitsEvent = new(It.Inc<SelectedEvent>());
+        public readonly ProtoItExc SelectedUnitsEvent = new(It.Inc<SelectedEvent>(), It.Exc<Selected>());
 
-        public readonly ProtoIt SelectedUnitViewsOn = new(It.Inc<SelectedEvent, TransformRef>());
+        public readonly ProtoIt ItemsEvent = new(It.Inc<Item, SelectedEvent>());
+        public readonly ProtoIt MiningEvent = new(It.Inc<MiningTag, SelectedEvent>());
+        
+        public readonly ProtoItExc SelectedUnitViewsOn = new(It.Inc<SelectedEvent, TransformRef>(), It.Exc<Selected>());
 
         public readonly ProtoIt SelectedViewIt = new(It.Inc<SelectedView>());
+        
+        public readonly ProtoIt SelectedItemsIt = new(It.Inc<Item, Selected>());
+        public readonly ProtoIt SelectedMiningIt = new(It.Inc<MiningTag, Selected>());
 
         public readonly ProtoIt SelectedIt = new(It.Inc<Selected>());
+        
     }
 
     public sealed class MainAspect : ProtoAspectInject
@@ -82,7 +89,7 @@ namespace ECS.Scripts.Boot
 
         public readonly ProtoIt MoveDirection = new(It.Inc<Position, Direction, Speed>());
 
-        public readonly ProtoIt UnitsSelected = new(It.Inc<Unit>());
+        public readonly ProtoIt UnitsSelected = new(It.Inc<Unit, Selected>());
         public readonly ProtoIt BuildFilter = new(It.Inc<BuildWall>());
 
         public readonly ProtoItExc RandsMover = new(It.Inc<Position, RandMove>(),
@@ -96,7 +103,7 @@ namespace ECS.Scripts.Boot
         public readonly ProtoPool<Mining> Mining;
 
 
-        public readonly ProtoItExc MiningFree = new(It.Inc<MiningTag, Position>(), It.Exc<ItemBusy>());
+        public readonly ProtoItExc MiningFree = new(It.Inc<MiningTag, MarkerWork, Position>(), It.Exc<ItemBusy>());
 
         public readonly ProtoIt MiningDied = new(It.Inc<MiningTag, Health, Position>());
 
@@ -116,8 +123,10 @@ namespace ECS.Scripts.Boot
         public readonly ProtoPool<Item> Items;
 
         public readonly ProtoPool<TargetDrop> TargetDrop;
+        
+        public readonly ProtoPool<MarkerWork> MarkerWork;
 
-        public readonly ProtoItExc ItemsFree = new(It.Inc<Item, Position>(), It.Exc<ItemBusy>());
+        public readonly ProtoItExc ItemsFree = new(It.Inc<Item, MarkerWork, Position>(), It.Exc<ItemBusy>());
 
         public readonly ProtoItExc FindItemProcessGet =
             new(It.Inc<FindItemProcess, Position, TransformRef>(), It.Exc<ItemInHand>());
