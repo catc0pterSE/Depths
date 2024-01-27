@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using DefaultNamespace;
 using ECS.Scripts.Boot;
 using ECS.Scripts.CharacterComponent;
 using ECS.Scripts.Data;
@@ -10,6 +11,7 @@ using ECS.Scripts.TestSystem;
 using Leopotam.Ecs;
 using Leopotam.EcsProto;
 using Leopotam.EcsProto.QoL;
+using Level;
 using Unity.Burst;
 using Unity.Collections;
 using Unity.Jobs;
@@ -24,6 +26,7 @@ namespace ECS.Scripts.WorkFeature
     {
         [DI]  private readonly StaticData _staticData;
         [DI] private readonly MainAspect _aspect;
+        [DI] private readonly PathFindingService _path;
 
         private readonly EcsFilter<MiningTag, Health, Position> _filter;
 
@@ -45,9 +48,17 @@ namespace ECS.Scripts.WorkFeature
             
                     var entityUnit = _aspect.World().NewEntity();
                     
+                    _aspect.SelectionAspect.CanSelect.Add(entityUnit);
                     _aspect.Items.Add(entityUnit);
                     _aspect.Position.Add(entityUnit).value = position;
                     _aspect.Transforms.Add(entityUnit).value = instanceObject.transform;
+
+                    var packedEntity = _aspect.World().PackEntity(entityUnit);
+
+                    var floor = position.FloorPosition();
+                    
+                    _path.Grid.Map[floor.x, floor.y].AddEntity(packedEntity);
+
                 }
             }
         }

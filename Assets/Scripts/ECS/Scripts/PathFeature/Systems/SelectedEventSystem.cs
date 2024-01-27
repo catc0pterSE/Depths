@@ -11,12 +11,11 @@ namespace ECS.Scripts.PathFeature.Systems
         [DI] private readonly MainAspect _mainAspect;
         [DI] private readonly SelectionAspect _selectionAspect;
         [DI] private readonly StaticData _staticData;
+        [DI] private readonly SelectionView _selectionView;
         public void Run()
         {
             foreach (var protoEntity in _selectionAspect.SelectedUnitViewsOn)
             {
-                Debug.Log("1");
-                
                 var tr = _mainAspect.Transforms.Get(protoEntity).value;
                 var instance = Object.Instantiate(_staticData.PrefabSelect, tr);
                 _selectionAspect.SelectedView.Add(protoEntity).value = instance.transform;
