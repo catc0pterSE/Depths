@@ -1,4 +1,7 @@
+using System.Collections.Generic;
+using DefaultNamespace;
 using ECS.Scripts.CharacterComponent;
+using ECS.Scripts.Data;
 using ECS.Scripts.GeneralComponents;
 using ECS.Scripts.Path.Component;
 using ECS.Scripts.ProviderComponents;
@@ -6,6 +9,9 @@ using ECS.Scripts.TestSystem;
 using ECS.Scripts.WorkFeature;
 using Leopotam.EcsProto;
 using Leopotam.EcsProto.QoL;
+using Level;
+using UnityEngine;
+using UnityEngine.EventSystems;
 
 namespace ECS.Scripts.Boot
 {
@@ -35,17 +41,135 @@ namespace ECS.Scripts.Boot
         
     }
 
+
+    public struct ZoneMode
+    {
+    }
+
+    public struct Zone
+    {
+        public Dictionary<Vector2Int, GameObject> Cells;
+    }
+    public sealed class ZoneAspect : ProtoAspectInject
+    {
+        public readonly ProtoPool<ZoneMode> ZoneMode;
+        
+        public readonly ProtoPool<Zone> Zone;
+        
+        public readonly ProtoIt ZoneIt = new(It.Inc<Zone>());
+        
+        public readonly ProtoIt ZoneModeIt = new(It.Inc<ZoneMode>());
+    }
+
+    public sealed class ZoneSystem : IProtoRunSystem
+    {
+        [DI] private readonly ZoneAspect _zoneAspect;
+        [DI] private readonly PathFindingService _path;
+        [DI] private readonly MainAspect _mainAspect;
+        [DI] private readonly StaticData _staticData;
+        
+        private bool _startSelected;
+        private Vector3 _startPos;
+        private Vector3 _endPos;
+        public void Run()
+        {
+            if(_zoneAspect.ZoneMode.Len() == 0) return;
+ 
+            if (Input.GetMouseButtonDown(1) && !EventSystem.current.IsPointerOverGameObject())
+            {
+                foreach (var protoEntity in _zoneAspect.ZoneModeIt)
+                {
+                    _mainAspect.ZoneAspect.ZoneMode.Del(protoEntity);
+                }
+                
+                _startSelected = false;
+                return;
+            }
+            
+            if (Input.GetMouseButtonDown(0) && !EventSystem.current.IsPointerOverGameObject())
+            {
+                _startPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+                _startSelected = true;
+            }
+
+            if (Input.GetMouseButton(0) && _startSelected)
+            {
+                _endPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
+            }
+            
+            if (Input.GetMouseButtonUp(0) && _startSelected)
+            {
+                
+                var startPos = _path.Grid.ClampPosition(_startPos).CeilPositionInt3();
+                var endPos = _path.Grid.ClampPosition(_endPos).CeilPositionInt3();
+                
+                int startX;
+                int endX;
+                
+                if (_startPos.x < _endPos.x)
+                {
+                    startX = startPos.x;
+                    endX = endPos.x;
+                }
+                else
+                {
+                    startX =  endPos.x;
+                    endX = startPos.x;
+                }
+                
+                int startY;
+                int endY;
+                
+                if (_startPos.y < _endPos.y)
+                {
+                    startY = startPos.y;
+                    endY = endPos.y;
+                }
+                else
+                {
+                    startY =  endPos.y;
+                    endY = startPos.y;
+                }
+
+                var world = _mainAspect.World();
+                var newZoneEntity = world.NewEntity();
+                ref var zone = ref _mainAspect.ZoneAspect.Zone.Add(newZoneEntity);
+                zone.Cells = new Dictionary<Vector2Int, GameObject>();
+                
+                for (int x = startX ; x < endX; x++)
+                {
+                    for (int y = startY; y < endY; y++)
+                    {
+                        var posInt = new Vector2Int(x,y);
+          
+                        var zoneCell = Object.Instantiate(_staticData.ZoneCell);
+                        zone.Cells.Add(posInt, zoneCell.gameObject);
+                        
+                        zoneCell.transform.position = new Vector3(x, y, 0);
+
+                    }
+                }
+                
+                _startSelected = false;
+            }
+        }
+    }
+
     public sealed class MainAspect : ProtoAspectInject
     {
         public readonly PathAspect PathAspect;
         public readonly BodyAspect BodyAspect;
         public readonly StatAspect StatAspect;
         public readonly SelectionAspect SelectionAspect;
+        public readonly ZoneAspect ZoneAspect;
 
         // public readonly ProtoPool<CreateBuild> CreateBuild;
         // public readonly ProtoIt CreateBuildIt = new(It.Inc<CreateBuild>());
 
 
+        public ProtoPool<AddCell> AddCell;
+        public readonly ProtoIt AddCellIt = new(It.Inc<AddCell, Position>());
+        
         public ProtoPool<Owner> Owners;
         public ProtoPool<BuildWall> Build;
         public ProtoPool<BuildTag> BuildTeg;
@@ -119,6 +243,10 @@ namespace ECS.Scripts.Boot
         public readonly ProtoPool<ItemWork> ItemWork;
 
         public readonly ProtoPool<ItemInHand> ItemsInHand;
+        
+        public readonly ProtoPool<Drop> Drop;
+        
+        public readonly ProtoIt ItemsInHandIt = new(It.Inc<ItemInHand, Drop>());
 
         public readonly ProtoPool<Item> Items;
 
@@ -127,6 +255,7 @@ namespace ECS.Scripts.Boot
         public readonly ProtoPool<MarkerWork> MarkerWork;
 
         public readonly ProtoItExc ItemsFree = new(It.Inc<Item, MarkerWork, Position>(), It.Exc<ItemBusy>());
+        public readonly ProtoIt ItemsLive = new(It.Inc<Item, MarkerWork, Position>());
 
         public readonly ProtoItExc FindItemProcessGet =
             new(It.Inc<FindItemProcess, Position, TransformRef>(), It.Exc<ItemInHand>());
@@ -140,5 +269,6 @@ namespace ECS.Scripts.Boot
 
         public readonly ProtoItExc FindWorkF = new(It.Inc<FindWork, Position>(),
             It.Exc<WorkProcess, PathFeature.Components.EntityPath>());
+        
     }
 }

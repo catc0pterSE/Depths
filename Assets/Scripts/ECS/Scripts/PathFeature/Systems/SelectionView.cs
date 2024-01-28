@@ -9,9 +9,11 @@ namespace ECS.Scripts.PathFeature.Systems
     public sealed class SelectionView : MonoBehaviour
     {
         [SerializeField] private RectTransform _box;
+        [SerializeField] private SpriteRenderer _boxSprite;
 
         [SerializeField] private Button _miningButton;
         [SerializeField] private Button _itemButton;
+        [SerializeField] private Button _zoneButton;
 
         private MainAspect _mainAspect;
 
@@ -22,18 +24,45 @@ namespace ECS.Scripts.PathFeature.Systems
         }
         public void SetScreen(Vector2 startPos, Vector2 endPos)
         {
-            float width = endPos.x - startPos.x;
-            float height = endPos.y - startPos.y;
-            _box.sizeDelta = new Vector2(Mathf.Abs(width), Mathf.Abs(height));
-            _box.anchoredPosition = startPos + new Vector2( width / 2, height / 2);
+            var fromStartToEnd = endPos - startPos; 
+            
+            
+            _box.sizeDelta = new Vector2(Mathf.Abs(fromStartToEnd.x), Mathf.Abs(fromStartToEnd.y));
+            
+            var middle = new Vector2( fromStartToEnd.x / 2, fromStartToEnd.y / 2);
+
+            var setPosition = startPos + middle;
+            
+            _box.anchoredPosition = setPosition;
+
+
+            startPos = Camera.main.ScreenToWorldPoint(startPos);
+            endPos = Camera.main.ScreenToWorldPoint(endPos);
+            
+            fromStartToEnd.x = endPos.x - startPos.x;
+            fromStartToEnd.y = endPos.y - startPos.y;
+            
+            middle = new Vector2( fromStartToEnd.x / 2, fromStartToEnd.y / 2);
+            setPosition = startPos + middle;
+             
+            _boxSprite.transform.position = setPosition;
+            _boxSprite.transform.localScale = fromStartToEnd;
         }
 
 
         private void OnEnable()
         {
+            _zoneButton.onClick.AddListener(CreateZone);
             _miningButton.onClick.AddListener(FindMining);
             _itemButton.onClick.AddListener(FindItems);
         }
+
+        private void CreateZone()
+        {
+            var entity = _mainAspect.World().NewEntity();
+            _mainAspect.ZoneAspect.ZoneMode.Add(entity);
+        }
+
         private void FindItems()
         {
             foreach (var entity in _mainAspect.SelectionAspect.SelectedItemsIt)

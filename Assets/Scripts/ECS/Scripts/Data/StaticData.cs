@@ -7,6 +7,8 @@ namespace ECS.Scripts.Data
     {
         [field: SerializeField] public GameObject PrefabSelect { get; private set; }
         [field: SerializeField] public GameObject UnitPrefab { get; private set; }
+        
+        [field: SerializeField] public SpriteRenderer ZoneCell { get; private set; }
         [field: SerializeField] public GameObject ItemPrefab { get; private set; }
         [field: SerializeField] public GameObject MinePrefab { get; private set; }
         [field: SerializeField] public BodyPartData[] BodyPartsData { get; private set; }

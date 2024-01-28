@@ -48,7 +48,7 @@ namespace ECS.Scripts.TestSystem
                 var pos =  new Vector3(Random.Range(0f, 100f), Random.Range(0f, 100f)).FloorPosition();
                 _aspect.Position.Add(entityUnit).value = new Vector3(pos.x, pos.y);
 
-                var packedEntity = _aspect.World().PackEntity(entityUnit);
+                var packedEntity = _aspect.World().PackEntityWithWorld(entityUnit);
                 
                 _path.Grid.Map[pos.x, pos.y].AddEntity(packedEntity);
                 

@@ -15,5 +15,12 @@ namespace DefaultNamespace
             new(Mathf.FloorToInt(position.x), Mathf.FloorToInt(position.y));
         public static Vector2Int RoundPosition(this Vector3 position) => 
             new(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y));
+        
+        public static Vector2Int CeilPositionInt2(this Vector3 position) => 
+            new(Mathf.CeilToInt(position.x), Mathf.CeilToInt(position.y));
+        public static Vector3Int CeilPositionInt3(this Vector3 position) => 
+            new(Mathf.CeilToInt(position.x), Mathf.CeilToInt(position.y));
+        public static Vector3 CeilPosition(this Vector3 position) => 
+            new(Mathf.Ceil(position.x), Mathf.Ceil(position.y));
     }
 }

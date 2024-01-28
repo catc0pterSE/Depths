@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using DefaultNamespace;
 using ECS.Scripts.Boot;
 using ECS.Scripts.Data;
 using ECS.Scripts.GeneralComponents;
@@ -16,20 +17,20 @@ namespace ECS.Scripts.PathFeature.Systems
 {
     public interface ISpatialHash
     {
-        public void UpdatePosition(ProtoPackedEntity entity, Vector3 position);
+        public void UpdatePosition(ProtoPackedEntityWithWorld entity, Vector3 position);
     }
     public sealed class SpatialHash : ISpatialHash
     {
         private IGrid _grid;
 
-        private Dictionary<ProtoPackedEntity, CellPFModel> _cells = new Dictionary<ProtoPackedEntity, CellPFModel>(100);
+        private Dictionary<ProtoPackedEntityWithWorld, CellPFModel> _cells = new Dictionary<ProtoPackedEntityWithWorld, CellPFModel>(100);
 
         public SpatialHash(IGrid grid)
         {
             _grid = grid;
         }
 
-        public void UpdatePosition(ProtoPackedEntity entity, Vector3 position)
+        public void UpdatePosition(ProtoPackedEntityWithWorld entity, Vector3 position)
         {
             var cell = _grid.FromWorldToCell(position);
             if (!cell.HasEntity(entity))
@@ -142,7 +143,7 @@ namespace ECS.Scripts.PathFeature.Systems
                  
                         foreach (var protoPackedEntity in cell.GetEntities())
                         {
-                            protoPackedEntity.Unpack(world, out var entity);
+                            protoPackedEntity.Unpack(out world, out var entity);
                             
                             if (_selectionAspect.CanSelect.Has(entity))
                             {
@@ -165,8 +166,8 @@ namespace ECS.Scripts.PathFeature.Systems
             worldEnd = _grid.Grid.ClampPosition(worldEnd);
             
             
-            var startPos = new Vector3Int(Mathf.FloorToInt(worldStart.x), Mathf.FloorToInt(worldStart.y));
-            endPos = new Vector3Int(Mathf.FloorToInt(worldEnd.x), Mathf.FloorToInt(worldEnd.y));
+            var startPos = worldStart.CeilPositionInt3();
+            endPos = worldEnd.CeilPositionInt3();
             return startPos;
         }
     }

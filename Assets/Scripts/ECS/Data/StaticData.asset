@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <PrefabSelect>k__BackingField: {fileID: 7497021080064675292, guid: a102252d349351b4aa4e8d2db18aad59, type: 3}
   <UnitPrefab>k__BackingField: {fileID: 8069450273526439535, guid: f3810531cade5eb459ef1915d0739bd6, type: 3}
+  <ZoneCell>k__BackingField: {fileID: 9052174161721618022, guid: 6a37822c2254b214092198f42ceb67f8, type: 3}
   <ItemPrefab>k__BackingField: {fileID: 1704530551043408017, guid: 71cbd675bc01eed4cbcfd19401ebe8ce, type: 3}
   <MinePrefab>k__BackingField: {fileID: 6867998251614753363, guid: 7ac7f3b9f5ca72c44a74f7f5da3dd788, type: 3}
   <BodyPartsData>k__BackingField:

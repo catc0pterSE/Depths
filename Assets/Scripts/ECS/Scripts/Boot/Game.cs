@@ -62,6 +62,7 @@ namespace ECS.Scripts.Boot
 	            .AddSystem(new CreateMousePathSystem())
 	            .AddSystem(new CreateRandPathSystem())
 	            
+	            .AddSystem(new ZoneSystem())
 	            .AddSystem(new SelectionSystem())
 	            .AddSystem(new SelectedViewEventSystem())
 	            .AddSystem(new SelectedEventSystem())
@@ -72,9 +73,14 @@ namespace ECS.Scripts.Boot
 	            .AddSystem(new WorkSystem())
 	            
 	            .AddSystem(new FindItemProcessSystem())
+	            
 	            .AddSystem(new MineProcessSystem())
 	            
 	            .AddSystem(new WorkCancelSystem())
+	            
+	            .AddSystem(new DropItem())
+	            
+	            .AddSystem(new AddCellSystem())
 	            
 	            // end work
                 
