@@ -8,12 +8,14 @@ using ECS.Scripts.WorkFeature;
 using Leopotam.EcsProto;
 using Leopotam.EcsProto.QoL;
 using Level;
+using Sirenix.OdinInspector;
+using Sirenix.Utilities;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace ECS.Scripts.Boot
 {
-	public sealed class Game : MonoBehaviour
+	public sealed class Game : SerializedMonoBehaviour
     {
 	    private ProtoWorld _world;
 	    private ProtoSystems _systems;
