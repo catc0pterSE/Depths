@@ -95,7 +95,7 @@ namespace ECS.Scripts.PathFeature.Systems
                 var moveData = positionNative[i];
                 _aspect.Position.Get(moveData.Id).value = moveData.result;
 
-                var packedEntity = world.PackEntity(moveData.Id);
+                var packedEntity = world.PackEntityWithWorld(moveData.Id);
                 
                 _spatialHash.UpdatePosition(packedEntity, moveData.result);
             }

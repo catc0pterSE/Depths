@@ -68,7 +68,6 @@ namespace ECS.Scripts.WorkFeature
         }
         public void GiveWork(ProtoEntity entity)
         {
-            Debug.Log("Mine");
             
             ref readonly var position = ref _aspect.Position.Get(entity).value;
             
@@ -197,7 +196,7 @@ namespace ECS.Scripts.WorkFeature
             var findEntity = positionNativeOut[0].indexEntity;
             
             _aspect.ItemsBusy.Add(findEntity);
-            _aspect.FindItemProcess.Add(entity).ItemEntity = _aspect.World().PackEntity(findEntity);
+            _aspect.FindItemProcess.Add(entity).ItemEntity = _aspect.World().PackEntityWithWorld(findEntity);
 
             ref var createPath = ref _aspect.PathAspect.CreatePath.GetOrAdd(entity, out _);
             

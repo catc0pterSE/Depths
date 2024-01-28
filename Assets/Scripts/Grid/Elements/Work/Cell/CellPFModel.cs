@@ -9,7 +9,7 @@ namespace Grid.Elements.Work.Cell
 {
     public class CellPFModel
     {
-        private List<ProtoPackedEntity> _entities = new List<ProtoPackedEntity>(10);
+        private List<ProtoPackedEntityWithWorld> _entities = new List<ProtoPackedEntityWithWorld>(10);
         private int _wayToFinalCell;
         public Vector3 WorldPosition { get; private set; }
         public Vector2Int GridPosition { get; private set; }
@@ -43,20 +43,20 @@ namespace Grid.Elements.Work.Cell
             TransitionCost = Int32.MaxValue;
             ComeFromCellPf = null;
         }
-        public void SetEntities(List<ProtoPackedEntity> entities) => 
+        public void SetEntities(List<ProtoPackedEntityWithWorld> entities) => 
             _entities = entities;
 
-        public List<ProtoPackedEntity> GetEntities() => _entities; 
-        public void AddEntity(ProtoPackedEntity entity) => _entities.Add(entity);
-        public void RemoveEntity(ProtoPackedEntity entity) => _entities.Remove(entity);
-        public bool HasEntity(ProtoPackedEntity entity) => _entities.Contains(entity);
+        public List<ProtoPackedEntityWithWorld> GetEntities() => _entities; 
+        public void AddEntity(ProtoPackedEntityWithWorld entity) => _entities.Add(entity);
+        public void RemoveEntity(ProtoPackedEntityWithWorld entity) => _entities.Remove(entity);
+        public bool HasEntity(ProtoPackedEntityWithWorld entity) => _entities.Contains(entity);
         public bool HasEntity() => _entities.Count > 0;
-        public bool HasEntityWithComponent(IProtoPool pool, MainAspect aspect)
+        public bool HasEntityWithComponent<T>(ProtoPool<T> pool, ProtoWorld protoWorld) where T : struct
         {
-            var protoWorld = aspect.World();
             foreach (var packedEntity in _entities)
             {
-                packedEntity.Unpack(protoWorld, out var protoEntity);
+                packedEntity.Unpack(out protoWorld, out var protoEntity);
+ 
                 if (pool.Has(protoEntity))
                 {
                     return true;
@@ -71,7 +71,7 @@ namespace Grid.Elements.Work.Cell
             var protoWorld = aspect.World();
             foreach (var packedEntity in _entities)
             {
-                packedEntity.Unpack(protoWorld, out var protoEntity);
+                packedEntity.Unpack(out protoWorld, out var protoEntity);
                 if (pool.Has(protoEntity))
                 {
                     entity = protoEntity;

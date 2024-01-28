@@ -27,11 +27,14 @@ namespace ECS.Scripts.WorkFeature
         [DI]  private readonly StaticData _staticData;
         [DI] private readonly MainAspect _aspect;
         [DI] private readonly PathFindingService _path;
-
-        private readonly EcsFilter<MiningTag, Health, Position> _filter;
-
+        
         public void Run()
         {
+            foreach (var protoEntity in _aspect.ItemsLive)
+            {
+                Debug.Log("Is live");
+            }
+
             foreach (var index in _aspect.MiningDied)
             {
                 ref var health = ref _aspect.Health.Get(index).value;
@@ -53,7 +56,7 @@ namespace ECS.Scripts.WorkFeature
                     _aspect.Position.Add(entityUnit).value = position;
                     _aspect.Transforms.Add(entityUnit).value = instanceObject.transform;
 
-                    var packedEntity = _aspect.World().PackEntity(entityUnit);
+                    var packedEntity = _aspect.World().PackEntityWithWorld(entityUnit);
 
                     var floor = position.FloorPosition();
                     
@@ -193,7 +196,7 @@ namespace ECS.Scripts.WorkFeature
     
                         work1.value.GiveWork(worker);
 
-                        _aspect.WorkProcess.Add(worker);
+                        _aspect.WorkProcess.GetOrAdd(worker, out _);
                     }
                 }
             }

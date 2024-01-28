@@ -33,7 +33,7 @@ namespace ECS.Scripts.TestSystem
                     if (cell.HasEntity())
                         continue;
 
-                    var packedEntity = _mainAspect.World().PackEntity(entity);
+                    var packedEntity = _mainAspect.World().PackEntityWithWorld(entity);
                     cell.AddEntity(packedEntity);
 
                     buildWall.transform.position = cell.WorldPosition;

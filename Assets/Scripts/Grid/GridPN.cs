@@ -57,7 +57,6 @@ namespace Grid
             position.x = Mathf.Clamp(position.x, 0, Size.x);
             position.y =  Mathf.Clamp(position.y, 0, Size.y);
             
-            Debug.Log(position);
             return position;   
         }
         public bool OutBounds(Vector3 position)

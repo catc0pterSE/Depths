@@ -3,8 +3,14 @@ using Leopotam.EcsProto.QoL;
 
 namespace ECS.Scripts.WorkFeature
 {
+    public struct AddCell
+    {
+    }
+    public struct Drop
+    {
+    }
     public struct ItemInHand
     {
-        public ProtoPackedEntity value;
+        public ProtoPackedEntityWithWorld packedEntity;
     }
 }

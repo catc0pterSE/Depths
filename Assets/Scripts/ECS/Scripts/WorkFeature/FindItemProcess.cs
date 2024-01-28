@@ -5,7 +5,7 @@ namespace ECS.Scripts.WorkFeature
 {
     public struct FindItemProcess
     {
-        public ProtoPackedEntity ItemEntity;
+        public ProtoPackedEntityWithWorld ItemEntity;
     }
     
     public struct ItemWork
