@@ -10,20 +10,6 @@ using UnityEngine;
 
 namespace ECS.Scripts.WorkFeature
 {
-
-    public struct Speed
-    {
-        public float value;
-    }
-
-    public struct FindNearElement
-    {
-        public IProtoIt Iterator;
-    }
-    public struct TargetWork
-    {
-        public ProtoPackedEntity PackedEntity;
-    }
     public sealed class MineProcessSystem : IProtoRunSystem
     {
         [DI] private readonly SceneData _sceneData;
@@ -33,6 +19,48 @@ namespace ECS.Scripts.WorkFeature
         
         [DI] private readonly MainAspect _mainAspect;
         public void Run()
+        {
+            CheckDistanceToMine();
+            
+            Mining();
+            
+            CancelMining();
+        }
+
+        private void CancelMining()
+        {
+            foreach (var entityProcess in _mainAspect.MiningProcessCancel)
+            {
+                ref readonly var owner = ref _mainAspect.Owners.Get(entityProcess).value;
+                owner.Unpack(_mainAspect.World(), out var ownerEntity);
+     
+                Debug.Log($"Destroy");
+                
+                _mainAspect.CurrentWork.Del(ownerEntity);
+            }
+        }
+
+        private void Mining()
+        {
+            foreach (var entityProcess in _mainAspect.MiningProcessMining)
+            {
+                ref readonly var packedEntity = ref _mainAspect.TargetWork.Get(entityProcess).PackedEntity;
+                packedEntity.Unpack(_mainAspect.World(), out var miningEntity);
+                
+                ref var health =  ref _mainAspect.Health.Get(miningEntity).value;
+                health -= 1 * _runtimeData.deltaTime;
+                
+                _mainAspect.OnChangeHealth.GetOrAdd(miningEntity, out _);
+                
+                if (health <= 0)
+                {
+                    Debug.Log($"Kill");
+                    _mainAspect.CancelWork.Add(entityProcess);
+                }
+            }
+        }
+
+        private void CheckDistanceToMine()
         {
             foreach (var entityProcess in _mainAspect.MiningProcessMove)
             {
@@ -57,33 +85,6 @@ namespace ECS.Scripts.WorkFeature
                     _mainAspect.Mining.Add(entityProcess);
                     
                 }
-            }
-            
-            foreach (var entityProcess in _mainAspect.MiningProcessMining)
-            {
-                ref readonly var packedEntity = ref _mainAspect.TargetWork.Get(entityProcess).PackedEntity;
-                packedEntity.Unpack(_mainAspect.World(), out var miningEntity);
-                
-                ref var health =  ref _mainAspect.Health.Get(miningEntity).value;
-                health -= 1 * _runtimeData.deltaTime;
-                
-                _mainAspect.OnChangeHealth.GetOrAdd(miningEntity, out _);
-                
-                if (health <= 0)
-                {
-                    Debug.Log($"Kill");
-                    _mainAspect.CancelWork.Add(entityProcess);
-                }
-            }
-            
-            foreach (var entityProcess in _mainAspect.MiningProcessCancel)
-            {
-                ref readonly var owner = ref _mainAspect.Owners.Get(entityProcess).value;
-                owner.Unpack(_mainAspect.World(), out var ownerEntity);
-     
-                Debug.Log($"Destroy");
-                
-                _mainAspect.CurrentWork.Del(ownerEntity);
             }
         }
     }
