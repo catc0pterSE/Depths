@@ -6,6 +6,7 @@ using ECS.Scripts.TestSystem;
 using Leopotam.Ecs;
 using Leopotam.EcsProto;
 using Leopotam.EcsProto.QoL;
+using UnityEngine;
 
 namespace ECS.Scripts.WorkFeature
 {
@@ -14,6 +15,15 @@ namespace ECS.Scripts.WorkFeature
     {
         public float value;
     }
+
+    public struct FindNearElement
+    {
+        public IProtoIt Iterator;
+    }
+    public struct TargetWork
+    {
+        public ProtoPackedEntity PackedEntity;
+    }
     public sealed class MineProcessSystem : IProtoRunSystem
     {
         [DI] private readonly SceneData _sceneData;
@@ -21,46 +31,59 @@ namespace ECS.Scripts.WorkFeature
         [DI] private readonly StaticData _staticData;
         
         
-        [DI] private readonly MainAspect _aspect;
+        [DI] private readonly MainAspect _mainAspect;
         public void Run()
         {
-            foreach (var index in _aspect.MiningProcessMove)
+            foreach (var entityProcess in _mainAspect.MiningProcessMove)
             {
-                ref readonly var component = ref _aspect.MineProcess.Get(index);
-                ref readonly var position = ref _aspect.Position.Get(index).value;
-
-                component.ItemEntity.Unpack(_aspect.World(), out var itemEntity);
+                ref readonly var owner = ref _mainAspect.Owners.Get(entityProcess).value;
                 
-                ref var positionItem = ref _aspect.Position.Get(itemEntity).value;
-
-                var dist = (position - positionItem).sqrMagnitude;
+                owner.Unpack(_mainAspect.World(), out var ownerEntity);
+                
+                ref readonly var position = ref _mainAspect.Position.Get(ownerEntity).value;
+                
+                ref readonly var packedEntity = ref _mainAspect.TargetWork.Get(entityProcess).PackedEntity;
+                
+                packedEntity.Unpack(_mainAspect.World(), out var miningEntity);
+                
+                ref readonly var positionItem = ref _mainAspect.Position.Get(miningEntity).value;
+                
+                var dist = position.FastDistance(positionItem);
+                
                 if (dist < 0.1f)
                 {
-                    _aspect.Mining.Add(index);
+                    
+                    Debug.Log($"Mine");
+                    _mainAspect.Mining.Add(entityProcess);
+                    
                 }
             }
             
-            foreach (var index in _aspect.MiningProcessMining)
+            foreach (var entityProcess in _mainAspect.MiningProcessMining)
             {
-                ref readonly var component = ref _aspect.MineProcess.Get(index);
+                ref readonly var packedEntity = ref _mainAspect.TargetWork.Get(entityProcess).PackedEntity;
+                packedEntity.Unpack(_mainAspect.World(), out var miningEntity);
                 
-                component.ItemEntity.Unpack(_aspect.World(), out var itemEntity);
-                
-                ref var health =  ref _aspect.Health.Get(itemEntity).value;
+                ref var health =  ref _mainAspect.Health.Get(miningEntity).value;
                 health -= 1 * _runtimeData.deltaTime;
                 
-                _aspect.OnChangeHealth.GetOrAdd(itemEntity, out _);
+                _mainAspect.OnChangeHealth.GetOrAdd(miningEntity, out _);
                 
                 if (health <= 0)
                 {
-                    _aspect.CancelWork.Add(index);
+                    Debug.Log($"Kill");
+                    _mainAspect.CancelWork.Add(entityProcess);
                 }
             }
             
-            foreach (var index in _aspect.MiningProcessCancel)
+            foreach (var entityProcess in _mainAspect.MiningProcessCancel)
             {
-                _aspect.MineProcess.Del(index);
-                _aspect.Mining.Del(index);
+                ref readonly var owner = ref _mainAspect.Owners.Get(entityProcess).value;
+                owner.Unpack(_mainAspect.World(), out var ownerEntity);
+     
+                Debug.Log($"Destroy");
+                
+                _mainAspect.CurrentWork.Del(ownerEntity);
             }
         }
     }

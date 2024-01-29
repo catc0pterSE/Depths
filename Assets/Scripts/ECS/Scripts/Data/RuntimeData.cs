@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using ECS.Scripts.WorkFeature;
 using Grid.Elements;
 using Grid.Elements.Work.Cell;
 using UnityEngine.Pool;
@@ -12,5 +13,7 @@ namespace ECS.Scripts.Data
         public float deltaTime;
 
         public ListPool<List<CellPFModel>> pathPool = new ListPool<List<CellPFModel>>();
+
+        public INewWork[] Works;
     }
 }

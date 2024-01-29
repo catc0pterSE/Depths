@@ -17,63 +17,70 @@ namespace ECS.Scripts.WorkFeature
 {
     public sealed class DropItem : IProtoRunSystem
     {
-        [DI] private readonly MainAspect _aspect;
+        [DI] private readonly MainAspect _mainAspect;
         [DI] private readonly PathFindingService _path;
         public void Run()
         {
-            foreach (var entity in _aspect.ItemsInHandIt)
+            foreach (var entity in _mainAspect.DropItemIt)
             {
-                ref var item = ref _aspect.ItemsInHand.Get(entity);;
+                ref var item = ref _mainAspect.ItemsInHand.Get(entity);;
                 
-                if(item.packedEntity.Unpack(out var world, out var itemEntity))
+                if(item.packedEntity.Unpack(_mainAspect.World(), out var itemEntity))
                 {
-                    Debug.Log("успешный успех");
+                    _mainAspect.Transforms.Get(itemEntity).value.SetParent(null);
                     
-                    _aspect.Transforms.Get(itemEntity).value.SetParent(null);
+                    _mainAspect.AddCell.Add(itemEntity);
                     
-                    _aspect.AddCell.Add(itemEntity);
+                    _mainAspect.Position.Get(itemEntity).value = _mainAspect.Position.Get(entity).value.FloorPosition();
                 
-                    _aspect.Sync.Del(itemEntity);
+                    _mainAspect.Sync.Del(itemEntity);
                     
-                    _aspect.ItemsInHand.Del(entity);
-                    _aspect.Drop.Del(entity);
+                    _mainAspect.ItemsInHand.Del(entity);
+                    
+                    _mainAspect.Drop.Del(entity);
                 }
             }
         }
     }
     public sealed class AddCellSystem : IProtoRunSystem
     {
-        [DI] private readonly MainAspect _aspect;
+        [DI] private readonly MainAspect _mainAspect;
         [DI] private readonly PathFindingService _path;
         public void Run()
         {
-            foreach (var protoEntity in _aspect.AddCellIt)
+            foreach (var protoEntity in _mainAspect.AddCellIt)
             {
                 var grid = _path.Grid;
 
-                ref readonly var position = ref _aspect.Position.Get(protoEntity).value;
+                ref readonly var position = ref _mainAspect.Position.Get(protoEntity).value;
                 
-                var cell = grid.GetCell(position.FloorPosition());
+                var cell = grid.GetCell(position.FloorPositionInt2());
 
-                var pack = _aspect.World().PackEntityWithWorld(protoEntity);
+                var pack = _mainAspect.World().PackEntityWithWorld(protoEntity);
                 
                 cell.AddEntity(pack);
                 
-                Debug.Log($"Add Cell {pack.GetHashCode()}");
-                Debug.Log($"Cell Info {cell.GetHashCode()}");
-                Debug.Log($"Cell G_Pos {cell.GridPosition}");
-                Debug.Log($"Cell W_Pos {cell.WorldPosition}");
-                
-                foreach (var protoPackedEntity in cell.GetEntities())
-                {
-                    Debug.Log($"unpack:{protoPackedEntity.Unpack(out var world, out var cellEntity)}");
-                    Debug.Log($"hashCode:{protoPackedEntity.GetHashCode()}");
-                    Debug.Log($"has item {_aspect.Items.Has(cellEntity)}");
-                }
-                
-                
-                _aspect.AddCell.Del(protoEntity);
+                _mainAspect.AddCell.Del(protoEntity);
 
+            }
+        }
+    }
+
+    public sealed class WorkNotFindElementSystem : IProtoRunSystem
+    {
+        [DI] private readonly MainAspect _aspect;
+        public void Run()
+        {
+            foreach (var entityProcess in _aspect.WorkProcessIt)
+            {
+                if (!_aspect.TargetWork.Has(entityProcess))
+                {
+                    _aspect.Owners.Get(entityProcess).value.Unpack(_aspect.World(), out var entityOwner);
+                    
+                    _aspect.CurrentWork.Del(entityOwner);
+                    
+                    _aspect.World().DelEntity(entityProcess);
+                }
             }
         }
     }
@@ -84,113 +91,127 @@ namespace ECS.Scripts.WorkFeature
         [DI] private readonly StaticData _staticData;
         
         
-        [DI] private readonly MainAspect _aspect;
+        [DI] private readonly MainAspect _mainAspect;
         [DI] private PathAspect _pathAspect;
         [DI] private PathFindingService _pathService;
         [DI] private SpatialHash _spatialHash;
         public void Run()
         {
-            foreach (var entityCharacter in _aspect.FindItemProcessGet)
+            foreach (var entityProcess in _mainAspect.FindItemProcessGet)
             {
-                ref readonly var component = ref _aspect.FindItemProcess.Get(entityCharacter);
-                ref readonly var position = ref _aspect.Position.Get(entityCharacter).value;
-
-                component.ItemEntity.Unpack(out var world, out var itemEntity);
+                ref var findProcess = ref _mainAspect.FindItemProcess.Get(entityProcess);
                 
-                ref var positionItem = ref _aspect.Position.Get(itemEntity).value;
+                if(findProcess.ItemInHand) continue;
+                
+                ref readonly var owner = ref _mainAspect.Owners.Get(entityProcess).value;
+                
+                owner.Unpack(_mainAspect.World(), out var ownerEntity);
 
-                var dist = (position - positionItem).sqrMagnitude;
+                if (_mainAspect.ItemsInHand.Has(ownerEntity))
+                {
+                    findProcess.ItemInHand = true;
+                    continue;
+                }
+                
+                ref readonly var position = ref _mainAspect.Position.Get(ownerEntity).value;
+                
+                ref readonly var packedEntity = ref _mainAspect.TargetWork.Get(entityProcess).PackedEntity;
+                
+                packedEntity.Unpack(_mainAspect.World(), out var itemEntity);
+                
+                ref readonly var positionItem = ref _mainAspect.Position.Get(itemEntity).value;
+                
+                var dist = position.FastDistance(positionItem);
 
                 if (dist < 0.1f)
                 {
-                    _aspect.ItemsInHand.Add(entityCharacter).packedEntity = component.ItemEntity;   
+                    var trItem = _mainAspect.Transforms.Get(itemEntity).value;
                     
-                    _aspect.Sync.Add(itemEntity);
-
-                    var trItem = _aspect.Transforms.Get(itemEntity).value;
-                    
-                    var trUnit = _aspect.Transforms.Get(entityCharacter).value;;
+                    var trUnit = _mainAspect.Transforms.Get(ownerEntity).value;;
 
                     trItem.SetParent(trUnit);
-                          
-                    ref var createPath = ref _aspect.PathAspect.CreatePath.GetOrAdd(entityCharacter, out _);
-                    createPath.start = position;
+                    
+                    _mainAspect.Sync.Add(itemEntity);
+                    _mainAspect.ItemsInHand.Add(ownerEntity).packedEntity = packedEntity;
 
-                    foreach (var protoEntity in _aspect.ZoneAspect.ZoneIt)
+                    findProcess.ItemInHand = true;
+                }
+            }
+            
+            foreach (var entityProcess in _mainAspect.FindZoneForItemIt)
+            {
+                ref var findProcess = ref _mainAspect.FindItemProcess.Get(entityProcess);
+                
+                ref readonly var owner = ref _mainAspect.Owners.Get(entityProcess).value;
+                
+                owner.Unpack(_mainAspect.World(), out var ownerEntity);
+                
+                if(!findProcess.ItemInHand) continue;
+                
+                ref var position = ref _mainAspect.Position.Get(ownerEntity).value;;
+                
+                ref var targetDrop = ref _mainAspect.TargetDrop.GetOrAdd(entityProcess, out bool added).value;
+                
+                var cellPosition = targetDrop.FloorPositionInt2();
+                
+                if (added)
+                {
+                    foreach (var protoEntity in _mainAspect.ZoneAspect.ZoneIt)
                     {
-                        var zone = _aspect.ZoneAspect.Zone.Get(protoEntity);
+                        var zone = _mainAspect.ZoneAspect.Zone.Get(protoEntity);
 
-                        foreach (var cellsValue in zone.Cells.Keys)
+                        foreach (var gridPosition in zone.Cells.Keys)
                         {
-                            var cellInZone = _pathService.Grid.GetCell(cellsValue);
-                            
-                            if (cellInZone.HasEntityWithComponent(_aspect.Items, _aspect.World()))
+                            var cellInZone = _pathService.Grid.GetCell(gridPosition);
+                            if (cellInZone.HasEntityWithComponent(_mainAspect.Items, _mainAspect.World()))
                             {
                                 continue;
                             }
-                            Debug.Log($"o Cell Info {cellInZone.GetHashCode()}");
-                            Debug.Log($"o Cell G_Pos {cellInZone.GridPosition}");
-                            Debug.Log($"o Cell W_Pos {cellInZone.WorldPosition}");
                             
+                            ref var createPath = ref _mainAspect.PathAspect.CreatePath.GetOrAdd(ownerEntity, out _);
                             
-                            var pathEnd = new Vector3(cellInZone.GridPosition.x, cellInZone.GridPosition.y);
+                            createPath.start = position;
+                            
+                            var pathEnd = cellInZone.WorldPosition;
                             
                             createPath.end = pathEnd;
-
-                            positionItem = cellInZone.WorldPosition;
                             
-                            _aspect.TargetDrop.GetOrAdd(entityCharacter, out _).value = pathEnd;
-                            
-                            break;
+                            targetDrop = pathEnd;
                         }
+    
                     }
-
                 }
-            }
-
-            foreach (var index in _aspect.FindItemProcessDrop)
-            {
-
-                ref var position = ref _aspect.Position.Get(index).value;;
-                ref var targetDrop = ref _aspect.TargetDrop.Get(index).value;;
                 
-                var cellPosition = targetDrop.FloorPosition();
-                
-                foreach (var protoEntity in _aspect.ZoneAspect.ZoneIt)
+                foreach (var protoEntity in _mainAspect.ZoneAspect.ZoneIt)
                 {
-                    var zone = _aspect.ZoneAspect.Zone.Get(protoEntity);
+                    var zone = _mainAspect.ZoneAspect.Zone.Get(protoEntity);
                     if(!zone.Cells.ContainsKey(cellPosition))
                         continue;
 
                     var cell = _pathService.Grid.GetCell(cellPosition);
                     
-                    if (cell.HasEntityWithComponent(_aspect.Items, _aspect.World()))
+                    if (cell.HasEntityWithComponent(_mainAspect.Items, _mainAspect.World()))
                     {
                         bool find = false;
                         foreach (var cellsValue in zone.Cells.Keys)
                         {
                             var cellInZone = _pathService.Grid.GetCell(cellsValue);
                             
-                            if (cellInZone.HasEntityWithComponent(_aspect.Items, _aspect.World()))
+                            if (cellInZone.HasEntityWithComponent(_mainAspect.Items, _mainAspect.World()))
                             {
                                 continue;
                             }
 
                             find = true;
                             
-                            ref var createPath = ref _aspect.PathAspect.CreatePath.GetOrAdd(index, out _);
+                            ref var createPath = ref _mainAspect.PathAspect.CreatePath.GetOrAdd(ownerEntity, out _);
+                            
                             createPath.start = position;
                             
                             var pathEnd = cellInZone.WorldPosition;
-
-
-                            ref var item = ref _aspect.ItemsInHand.Get(index).packedEntity;
-
-                            item.Unpack(out var world, out var entity);
-                            
-                            _aspect.Position.Get(entity).value = pathEnd;
                             
                             createPath.end = pathEnd;
+                            
                             targetDrop = pathEnd;
                             
                             break;
@@ -200,30 +221,38 @@ namespace ECS.Scripts.WorkFeature
                         {
                             targetDrop = position;
                             
-                            ref var item = ref _aspect.ItemsInHand.Get(index).packedEntity;
-
-                            item.Unpack(out var world, out var entity);
+                            _mainAspect.Drop.Add(ownerEntity);
                             
-                            _aspect.Position.Get(entity).value = position;
                         }
                     }
                 }
+            }
+            
+            foreach (var entityProcess in _mainAspect.FindItemProcessDrop)
+            {
+                ref readonly var owner = ref _mainAspect.Owners.Get(entityProcess).value;
+                owner.Unpack(_mainAspect.World(), out var ownerEntity);
                 
+                ref var position = ref _mainAspect.Position.Get(ownerEntity).value;;
+                
+                ref var targetDrop = ref _mainAspect.TargetDrop.Get(entityProcess).value;;
 
                 var dist = position.FastDistance(targetDrop);
 
                 if (dist < 0.01f)
                 {
-                    _aspect.CancelWork.Add(index);
+                    _mainAspect.CancelWork.Add(entityProcess);
                 }
-
             }
 
-            foreach (var index in _aspect.FindItemProcessCancel)
+            foreach (var entityProcess in _mainAspect.FindItemProcessCancel)
             {
-                _aspect.Drop.Add(index);
-                _aspect.TargetDrop.Del(index);
-                _aspect.FindItemProcess.Del(index);
+                ref readonly var owner = ref _mainAspect.Owners.Get(entityProcess).value;
+                owner.Unpack(_mainAspect.World(), out var ownerEntity);
+                
+                _mainAspect.Drop.Add(ownerEntity);
+                
+                _mainAspect.CurrentWork.Del(ownerEntity);
             }
         }
         
