@@ -327,7 +327,7 @@ namespace ECS.Scripts.Boot
 
 
         public readonly ProtoItExc WorkersNotWorking = new(It.Inc<Works>(),
-            It.Exc<CurrentWork>());
+            It.Exc<CurrentWork, NewWork>());
 
         public readonly ProtoItExc FindWorkF = new(It.Inc<FindWork, Position>(),
             It.Exc<WorkProcess, PathFeature.Components.EntityPath>());
