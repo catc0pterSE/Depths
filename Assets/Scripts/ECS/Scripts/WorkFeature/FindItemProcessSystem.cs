@@ -15,75 +15,6 @@ using UnityEngine;
 
 namespace ECS.Scripts.WorkFeature
 {
-    public sealed class DropItem : IProtoRunSystem
-    {
-        [DI] private readonly MainAspect _mainAspect;
-        [DI] private readonly PathFindingService _path;
-        public void Run()
-        {
-            foreach (var entity in _mainAspect.DropItemIt)
-            {
-                ref var item = ref _mainAspect.ItemsInHand.Get(entity);;
-                
-                if(item.packedEntity.Unpack(_mainAspect.World(), out var itemEntity))
-                {
-                    _mainAspect.Transforms.Get(itemEntity).value.SetParent(null);
-                    
-                    _mainAspect.AddCell.Add(itemEntity);
-                    
-                    _mainAspect.Position.Get(itemEntity).value = _mainAspect.Position.Get(entity).value.FloorPosition();
-                
-                    _mainAspect.Sync.Del(itemEntity);
-                    
-                    _mainAspect.ItemsInHand.Del(entity);
-                    
-                    _mainAspect.Drop.Del(entity);
-                }
-            }
-        }
-    }
-    public sealed class AddCellSystem : IProtoRunSystem
-    {
-        [DI] private readonly MainAspect _mainAspect;
-        [DI] private readonly PathFindingService _path;
-        public void Run()
-        {
-            foreach (var protoEntity in _mainAspect.AddCellIt)
-            {
-                var grid = _path.Grid;
-
-                ref readonly var position = ref _mainAspect.Position.Get(protoEntity).value;
-                
-                var cell = grid.GetCell(position.FloorPositionInt2());
-
-                var pack = _mainAspect.World().PackEntityWithWorld(protoEntity);
-                
-                cell.AddEntity(pack);
-                
-                _mainAspect.AddCell.Del(protoEntity);
-
-            }
-        }
-    }
-
-    public sealed class WorkNotFindElementSystem : IProtoRunSystem
-    {
-        [DI] private readonly MainAspect _aspect;
-        public void Run()
-        {
-            foreach (var entityProcess in _aspect.WorkProcessIt)
-            {
-                if (!_aspect.TargetWork.Has(entityProcess))
-                {
-                    _aspect.Owners.Get(entityProcess).value.Unpack(_aspect.World(), out var entityOwner);
-                    
-                    _aspect.CurrentWork.Del(entityOwner);
-                    
-                    _aspect.World().DelEntity(entityProcess);
-                }
-            }
-        }
-    }
     public sealed class FindItemProcessSystem : IProtoRunSystem
     {
         [DI] private readonly SceneData _sceneData;
@@ -96,6 +27,17 @@ namespace ECS.Scripts.WorkFeature
         [DI] private PathFindingService _pathService;
         [DI] private SpatialHash _spatialHash;
         public void Run()
+        {
+            CheckDistanceGetItem();
+            
+            FindZoneForDrop();
+            
+            CheckDistanceDrop();
+
+            CancelWork();
+        }
+
+        private void CheckDistanceGetItem()
         {
             foreach (var entityProcess in _mainAspect.FindItemProcessGet)
             {
@@ -137,7 +79,10 @@ namespace ECS.Scripts.WorkFeature
                     findProcess.ItemInHand = true;
                 }
             }
-            
+        }
+
+        private void FindZoneForDrop()
+        {
             foreach (var entityProcess in _mainAspect.FindZoneForItemIt)
             {
                 ref var findProcess = ref _mainAspect.FindItemProcess.Get(entityProcess);
@@ -227,7 +172,10 @@ namespace ECS.Scripts.WorkFeature
                     }
                 }
             }
-            
+        }
+
+        private void CheckDistanceDrop()
+        {
             foreach (var entityProcess in _mainAspect.FindItemProcessDrop)
             {
                 ref readonly var owner = ref _mainAspect.Owners.Get(entityProcess).value;
@@ -244,7 +192,10 @@ namespace ECS.Scripts.WorkFeature
                     _mainAspect.CancelWork.Add(entityProcess);
                 }
             }
+        }
 
+        private void CancelWork()
+        {
             foreach (var entityProcess in _mainAspect.FindItemProcessCancel)
             {
                 ref readonly var owner = ref _mainAspect.Owners.Get(entityProcess).value;
@@ -255,6 +206,5 @@ namespace ECS.Scripts.WorkFeature
                 _mainAspect.CurrentWork.Del(ownerEntity);
             }
         }
-        
     }
 }
