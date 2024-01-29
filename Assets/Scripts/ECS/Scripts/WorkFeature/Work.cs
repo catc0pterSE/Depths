@@ -4,5 +4,6 @@ namespace ECS.Scripts.WorkFeature
     {
         public int Order;
         public IWork value;
+        public INewWork valueNew;
     }
 }

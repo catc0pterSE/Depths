@@ -38,14 +38,12 @@ namespace ECS.Scripts.TestSystem
 
                 var entityUnit = _aspect.World().NewEntity();
                 
-                
-                
                 _aspect.MiningTag.Add(entityUnit);
                 _aspect.SelectionAspect.CanSelect.Add(entityUnit);
                 _aspect.Health.Add(entityUnit).value = 5f;
                 _aspect.Transforms.Add(entityUnit).value = instanceObject.transform;
                 
-                var pos =  new Vector3(Random.Range(0f, 100f), Random.Range(0f, 100f)).FloorPosition();
+                var pos =  new Vector3(Random.Range(0f, 100f), Random.Range(0f, 100f)).FloorPositionInt2();
                 _aspect.Position.Add(entityUnit).value = new Vector3(pos.x, pos.y);
 
                 var packedEntity = _aspect.World().PackEntityWithWorld(entityUnit);
@@ -74,6 +72,7 @@ namespace ECS.Scripts.TestSystem
         [DI] private readonly SelectionAspect _selectionAspect;
 
         private int _i;
+        [DI] private RuntimeData _runtimeData;
 
         public void Run()
         {
@@ -99,6 +98,16 @@ namespace ECS.Scripts.TestSystem
                 _aspect.Units.Add(entityUnit);
                 _aspect.Transforms.Add(entityUnit).value = instanceObject.transform;
                 _aspect.Position.Add(entityUnit).value = pos;
+
+
+                var solutionEntity = _aspect.World().NewEntity();
+                _aspect.RandMove.Add(solutionEntity);
+                _aspect.Owners.Add(solutionEntity).value = _aspect.World().PackEntity(entityUnit);
+                
+                
+                var packedSolution = _aspect.World().PackEntity(solutionEntity);
+                _aspect.AISolution.Add(entityUnit).packedEntity = packedSolution;
+                
                 
                 _selectionAspect.CanSelect.Add(entityUnit);
                 _aspect.RandMove.Add(entityUnit);
@@ -110,14 +119,21 @@ namespace ECS.Scripts.TestSystem
                 
                 _aspect.Speed.Add(entityUnit).value = 10f;
 
+                var randOrder = Random.Range(0, 2);
+                
                 var findWork = new Work();
-                findWork.Order = 0;
-                findWork.value = _findItemWork;
+                findWork.Order = randOrder == 0 ? 1 : 2;
+                
+                Debug.Log("1 " +  findWork.Order);
+                
+                findWork.valueNew = _runtimeData.Works[0];
 
                 
                 var findMine = new Work();
-                findMine.Order = 0;
-                findMine.value = _findMineWork;
+                findMine.Order = randOrder == 0 ? 2 : 1;
+                
+                Debug.Log("2 " +  findMine.Order);
+                findMine.valueNew = _runtimeData.Works[1];
                 
 
                 _aspect.Works.Add(entityUnit).value = new Work[]
@@ -180,10 +196,14 @@ namespace ECS.Scripts.TestSystem
                 body.parts.Add(bodyPartData.Part, _aspect.World().PackEntity(partEntity));
             }
         }
+
         public void Init(IProtoSystems systems)
         {
-            _findItemWork = new FindItemWork(_aspect);
-            _findMineWork = new FindMineWork(_aspect);
+            _runtimeData.Works = new INewWork[]
+            {
+                new NewFindItemWork(_aspect),
+                new NewFindMineWork(_aspect)
+            };
         }
     }
 }

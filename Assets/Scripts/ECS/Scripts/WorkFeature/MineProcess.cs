@@ -6,7 +6,6 @@ namespace ECS.Scripts.WorkFeature
 {
     public struct MineProcess
     {
-        public ProtoPackedEntity ItemEntity;
     }
 
     public struct Mining

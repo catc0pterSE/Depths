@@ -11,6 +11,6 @@ namespace ECS.Scripts.WorkFeature
     }
     public struct ItemInHand
     {
-        public ProtoPackedEntityWithWorld packedEntity;
+        public ProtoPackedEntity packedEntity;
     }
 }

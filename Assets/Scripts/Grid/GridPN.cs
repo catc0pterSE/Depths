@@ -42,11 +42,11 @@ namespace Grid
             Map[position.x, position.y];
 
         public CellPFModel FromWorldToCell(Vector3 position) => 
-            GetCell(position.FloorPosition());
+            GetCell(position.FloorPositionInt2());
 
         public bool TryGetCell(Vector3 position, out CellPFModel cell)
         {
-            if (TryGetCell(position.FloorPosition(), out cell))
+            if (TryGetCell(position.FloorPositionInt2(), out cell))
                 return true;
 
             return false;
@@ -61,7 +61,7 @@ namespace Grid
         }
         public bool OutBounds(Vector3 position)
         {
-            var floorPosition = position.FloorPosition();
+            var floorPosition = position.FloorPositionInt2();
             
             return floorPosition.x > Size.x ||
                    floorPosition.y > Size.y ||

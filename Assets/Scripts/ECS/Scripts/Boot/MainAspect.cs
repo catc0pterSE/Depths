@@ -8,6 +8,7 @@ using ECS.Scripts.ProviderComponents;
 using ECS.Scripts.TestSystem;
 using ECS.Scripts.WorkFeature;
 using Leopotam.EcsProto;
+using Leopotam.EcsProto.Ai.Utility;
 using Leopotam.EcsProto.QoL;
 using Level;
 using UnityEngine;
@@ -162,10 +163,38 @@ namespace ECS.Scripts.Boot
         public readonly StatAspect StatAspect;
         public readonly SelectionAspect SelectionAspect;
         public readonly ZoneAspect ZoneAspect;
+        public readonly AiUtilityModuleAspect AiUtilityAspect;
 
         // public readonly ProtoPool<CreateBuild> CreateBuild;
         // public readonly ProtoIt CreateBuildIt = new(It.Inc<CreateBuild>());
 
+
+        public bool AddSolution<T>(ProtoPool<T> pool, ProtoEntity entity, out ProtoEntity solutionEntity) where T : struct
+        {
+            ref var aiSolution = ref AISolution.Get(entity);
+            var protoWorld = World();
+
+            if (aiSolution.packedEntity.Unpack(protoWorld, out var unPackedSolutionEntity))
+            {
+                solutionEntity = unPackedSolutionEntity;
+                
+                if(pool.Has(unPackedSolutionEntity)) return false;
+                
+                protoWorld.DelEntity(unPackedSolutionEntity);
+            }
+            
+            var solutionNewEntity = protoWorld.NewEntity();
+            
+            pool.Add(solutionNewEntity);
+            
+            Owners.Add(solutionNewEntity).value = protoWorld.PackEntity(entity);
+            
+            aiSolution.packedEntity = protoWorld.PackEntity(solutionNewEntity);
+
+            solutionEntity = solutionNewEntity;
+            
+            return true;
+        }
 
         public ProtoPool<AddCell> AddCell;
         public readonly ProtoIt AddCellIt = new(It.Inc<AddCell, Position>());
@@ -173,7 +202,7 @@ namespace ECS.Scripts.Boot
         public ProtoPool<Owner> Owners;
         public ProtoPool<BuildWall> Build;
         public ProtoPool<BuildTag> BuildTeg;
-
+        
         public ProtoPool<Unit> Units;
 
         public ProtoPool<RandMove> RandMove;
@@ -191,6 +220,14 @@ namespace ECS.Scripts.Boot
         public readonly ProtoPool<Speed> Speed;
 
         public readonly ProtoPool<Works> Works;
+        
+        public readonly ProtoPool<FindNearElement> FindNearElement;
+        
+        public readonly ProtoPool<TargetWork> TargetWork;
+        
+        public readonly ProtoIt FindNearElementIt =new(It.Inc<FindNearElement>());
+        
+        public readonly ProtoIt TargetWorkIt =new(It.Inc<TargetWork>());
 
 
         // to do -> 
@@ -199,12 +236,22 @@ namespace ECS.Scripts.Boot
         public readonly ProtoPool<DiedEvent> DiedsEvent;
 
         public readonly ProtoPool<WorkProcess> WorkProcess;
+        public readonly ProtoIt WorkProcessIt = new(It.Inc<WorkProcess, Owner>());
 
         public readonly ProtoPool<CancelWork> CancelWork;
 
         public readonly ProtoIt CancelWorkF = new(It.Inc<CancelWork>());
 
         public readonly ProtoPool<ItemBusy> ItemsBusy;
+        
+        
+        public readonly ProtoIt AISolutionIt = new(It.Inc<AISolution>());
+        
+        public readonly ProtoIt AISolutionResponceIt = new(It.Inc<AISolution, AiUtilityResponseEvent>());
+        
+        public readonly ProtoPool<AISolution> AISolution;
+        
+        public readonly ProtoPool<FindFood> FindFood;
 
 
         public readonly ProtoItExc SyncPosition = new(It.Inc<TransformRef, Position>(), It.Exc<Sync>());
@@ -216,8 +263,7 @@ namespace ECS.Scripts.Boot
         public readonly ProtoIt UnitsSelected = new(It.Inc<Unit, Selected>());
         public readonly ProtoIt BuildFilter = new(It.Inc<BuildWall>());
 
-        public readonly ProtoItExc RandsMover = new(It.Inc<Position, RandMove>(),
-            It.Exc<PathFeature.Components.EntityPath, WorkProcess>());
+        public readonly ProtoIt RandsMover = new(It.Inc<RandMove, Owner>());
 
 
         public readonly ProtoPool<Sync> Sync;
@@ -230,12 +276,13 @@ namespace ECS.Scripts.Boot
         public readonly ProtoItExc MiningFree = new(It.Inc<MiningTag, MarkerWork, Position>(), It.Exc<ItemBusy>());
 
         public readonly ProtoIt MiningDied = new(It.Inc<MiningTag, Health, Position>());
+        
 
-        public readonly ProtoItExc MiningProcessMove = new(It.Inc<MineProcess, Position>(), It.Exc<Mining>());
+        public readonly ProtoItExc MiningProcessMove = new(It.Inc<MineProcess, TargetWork>(), It.Exc<Mining>());
 
-        public readonly ProtoIt MiningProcessMining = new(It.Inc<MineProcess, Position, Mining>());
+        public readonly ProtoIt MiningProcessMining = new(It.Inc<MineProcess, TargetWork, Mining>());
 
-        public readonly ProtoIt MiningProcessCancel = new(It.Inc<MineProcess, CancelWork>());
+        public readonly ProtoIt MiningProcessCancel = new(It.Inc<MineProcess, TargetWork, CancelWork>());
 
 
         public readonly ProtoPool<FindItemProcess> FindItemProcess;
@@ -246,26 +293,41 @@ namespace ECS.Scripts.Boot
         
         public readonly ProtoPool<Drop> Drop;
         
-        public readonly ProtoIt ItemsInHandIt = new(It.Inc<ItemInHand, Drop>());
+        public readonly ProtoIt DropItemIt = new(It.Inc<ItemInHand, Drop>());
 
         public readonly ProtoPool<Item> Items;
 
         public readonly ProtoPool<TargetDrop> TargetDrop;
         
+        public readonly ProtoPool<CurrentWork> CurrentWork;
+        
+        public readonly ProtoPool<NewWork> NewWork;
+        
+        public readonly ProtoPool<WorkCost> WorkCost;
+        
+        
         public readonly ProtoPool<MarkerWork> MarkerWork;
 
         public readonly ProtoItExc ItemsFree = new(It.Inc<Item, MarkerWork, Position>(), It.Exc<ItemBusy>());
         public readonly ProtoIt ItemsLive = new(It.Inc<Item, MarkerWork, Position>());
+        
+        public readonly ProtoIt NewWorkIt = new(It.Inc<NewWork>());
+        
 
-        public readonly ProtoItExc FindItemProcessGet =
-            new(It.Inc<FindItemProcess, Position, TransformRef>(), It.Exc<ItemInHand>());
+        public readonly ProtoIt FindItemProcessGet =
+            new(It.Inc<FindItemProcess>());
+        
+        public readonly ProtoIt FindZoneForItemIt = 
+            new(It.Inc<FindItemProcess>());
 
-        public readonly ProtoIt FindItemProcessDrop = new(It.Inc<ItemInHand, Position, TargetDrop>());
-        public readonly ProtoIt FindItemProcessCancel = new(It.Inc<FindItemProcess, CancelWork>());
+        public readonly ProtoIt FindItemProcessDrop = 
+            new(It.Inc<FindItemProcess, TargetDrop>());
+        public readonly ProtoIt FindItemProcessCancel = 
+            new(It.Inc<FindItemProcess, TargetWork, CancelWork>());
 
 
-        public readonly ProtoItExc WorkersNotWorking = new(It.Inc<Works, Position>(),
-            It.Exc<WorkProcess, PathFeature.Components.EntityPath>());
+        public readonly ProtoItExc WorkersNotWorking = new(It.Inc<Works>(),
+            It.Exc<CurrentWork>());
 
         public readonly ProtoItExc FindWorkF = new(It.Inc<FindWork, Position>(),
             It.Exc<WorkProcess, PathFeature.Components.EntityPath>());

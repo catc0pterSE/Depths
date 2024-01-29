@@ -4,13 +4,15 @@
 // ––‒‒––‒–––‒‒–‒––‒–––––––‒––‒–––––‒–‒––––‒––‒–‒––––‒––‒‒––‒‒–‒–––‒––––––‒
 
 using System;
+using System.Collections;
 using System.Runtime.CompilerServices;
 #if ENABLE_IL2CPP
 using Unity.IL2CPP.CompilerServices;
 #endif
 
 namespace Leopotam.EcsProto {
-    public interface IProtoIt {
+    public interface IProtoIt 
+    {
         IProtoIt Init (ProtoWorld world);
         ProtoWorld World ();
         bool Has (ProtoEntity entity);

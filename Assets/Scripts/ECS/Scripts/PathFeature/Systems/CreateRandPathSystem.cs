@@ -13,15 +13,25 @@ namespace ECS.Scripts.PathFeature.Systems
 
         [DI] private PathFindingService _pathFindingService;
         
-        [DI] private readonly MainAspect _aspect;
+        [DI] private readonly MainAspect _mainAspect;
         
         [DI] private PathAspect _pathAspect;
         public void Run()
         {
-            foreach (var index in _aspect.RandsMover)
+            foreach (var entityRand in _mainAspect.RandsMover)
             {
-                ref var position = ref _aspect.Position.Get(index).value;
-                ref var randMove = ref _aspect.RandMove.Get(index);
+                ref readonly var owner = ref _mainAspect.Owners.Get(entityRand).value;
+                owner.Unpack(_mainAspect.World(), out var ownerEntity);
+                
+                if(_mainAspect.PathAspect.Path.Has(ownerEntity))
+                {
+                    continue;
+                }
+
+                
+                ref readonly var position = ref _mainAspect.Position.Get(ownerEntity).value;
+                
+                ref var randMove = ref _mainAspect.RandMove.Get(entityRand);
 
                 randMove.time -= _runtimeData.deltaTime;
                 
@@ -37,7 +47,7 @@ namespace ECS.Scripts.PathFeature.Systems
                         continue;
                     }
 
-                    ref var createPath = ref _pathAspect.CreatePath.GetOrAdd(index, out _);
+                    ref var createPath = ref _pathAspect.CreatePath.GetOrAdd(ownerEntity, out _);
                     
                     createPath.start = position;
                     createPath.end = pathEnd;

@@ -5,5 +5,6 @@ namespace ECS.Scripts.TestSystem
         Health,
         Mining,
         Speed,
+        Hungry,
     }
 }
