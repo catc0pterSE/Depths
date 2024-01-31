@@ -8,7 +8,7 @@ namespace Grid.Quad
         private const int Divider = 2;
 
         private readonly Rectangle _boundary;
-        private readonly List<Point> _points;
+        private readonly List<CellPoint> _points;
         private List<Quadtree> _rectangles;
         private readonly int _capacity;
         private bool _divided = false;
@@ -17,17 +17,17 @@ namespace Grid.Quad
         {
             _boundary = boundary;
             _capacity = capacity;
-            _points = new List<Point>();
+            _points = new List<CellPoint>();
         }
 
-        public bool Insert(Point point)
+        public bool Insert(CellPoint cellPoint)
         {
-            if (_boundary.Contains(point) == false)
+            if (_boundary.Contains(cellPoint) == false)
                 return false;
 
             if (_points.Count < _capacity)
             {
-                _points.Add(point);
+                _points.Add(cellPoint);
                 return true;
             }
 
@@ -36,8 +36,8 @@ namespace Grid.Quad
 
             foreach (var tree in _rectangles)
             {
-                tree.Insert(point);
-                return true;
+                if (tree.Insert(cellPoint))
+                    return true;
             }
 
             return true;
@@ -65,6 +65,26 @@ namespace Grid.Quad
             }
 
             _divided = true;
+        }
+
+        public List<CellPoint> Query(Rectangle rectangle, List<CellPoint> cellPoints)
+        {
+            cellPoints ??= new List<CellPoint>();
+
+            if (_boundary.Intersects(rectangle) == false)
+                return cellPoints;
+
+            foreach (var point in _points)
+                if (rectangle.Contains(point))
+                    cellPoints.Add(point);
+
+            if (_divided)
+            {
+                foreach (var element in _rectangles)
+                    element.Query(rectangle, cellPoints);
+            }
+
+            return cellPoints;
         }
     }
 }
