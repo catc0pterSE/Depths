@@ -5,12 +5,12 @@ using Cysharp.Threading.Tasks;
 
 namespace CodeBase.Common.StateMachine
 {
-    public abstract class StateMachine
+    public abstract class BaseStateMachine
     {
         private IState _currentState;
         private Dictionary<Type, IState> _states;
 
-        public void RegisterStates(IEnumerable<IState> states) =>
+        public void RegisterStates (IEnumerable<IState> states) =>
             _states = states.ToDictionary(state => state.GetType(), state => state);
 
         protected async UniTask Enter<TState>() where TState : class, IParameterlessState

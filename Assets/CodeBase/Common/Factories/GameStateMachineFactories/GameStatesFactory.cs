@@ -8,30 +8,22 @@ namespace CodeBase.Common.Factories.GameStateMachineFactories
 {
     public class GameStatesFactory : IStatesFactory
     {
-        private readonly IGameStateMachine _gameStateMachine;
-        private Dictionary<Type, Func<IState>> _typedCreationStrategies;
-
-
-        public GameStatesFactory(IGameStateMachine gameStateMachine)
-        {
-            _gameStateMachine = gameStateMachine;
-            InitializeStates();
-        }
-
-        private void InitializeStates()
-        {
-            _typedCreationStrategies = new Dictionary<Type, Func<IState>>()
+        private Dictionary<Type, Func<IGameStateMachine, IState>> _typedCreationStrategies =
+            new Dictionary<Type, Func<IGameStateMachine, IState>>()
             {
-                [typeof(BootstrapState)] = () => new BootstrapState(_gameStateMachine)
-            };
-        }
+                [typeof(BootstrapState)] = (gameStateMachine) => new BootstrapState(gameStateMachine)
 
-        public IState Create<T>() where T : IState
+            };
+
+        public IState Create<T>(BaseStateMachine context) where T : IState
         {
-            if (!_typedCreationStrategies.TryGetValue(typeof(T), out Func<IState> strategy))
+            if (context is not GameStateMachine gameStateMachine)
+                throw new ArgumentException($"StateMachine of type {context.GetType()} is not applicable to {GetType()}");
+            
+            if (!_typedCreationStrategies.TryGetValue(typeof(T), out Func<IGameStateMachine, IState> strategy))
                 throw new ArgumentException($"No valid state creation func assigned to type {typeof(T)}");
 
-            return strategy.Invoke();
+            return strategy.Invoke(gameStateMachine);
         }
     }
 }

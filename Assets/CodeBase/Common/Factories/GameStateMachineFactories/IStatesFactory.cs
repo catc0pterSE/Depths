@@ -6,6 +6,6 @@ namespace CodeBase.Common.Factories.GameStateMachineFactories
 {
     public interface IStatesFactory
     {
-        IState Create<T>() where T : IState;
+        IState Create<T>(BaseStateMachine context) where T : IState;
     }
 }

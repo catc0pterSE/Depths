@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 
 namespace CodeBase.Infrastructure.StateMachine
 {
-    public class GameStateMachine : Common.StateMachine.StateMachine, IGameStateMachine
+    public class GameStateMachine : BaseStateMachine, IGameStateMachine
     {
         public UniTask EnterBootStrapState() =>
             Enter<BootstrapState>();

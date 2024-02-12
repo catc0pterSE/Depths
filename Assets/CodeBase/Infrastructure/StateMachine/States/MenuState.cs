@@ -5,11 +5,10 @@ namespace CodeBase.Infrastructure.StateMachine.States
 {
     public class MenuState: IParameterlessState
     {
-        private readonly GameStateMachine _gameStateMachine;
+        private BaseStateMachine _gameStateMachine;
 
-        public MenuState(GameStateMachine gameStateMachine)
+        public MenuState()
         {
-            _gameStateMachine = gameStateMachine;
         }
 
         public UniTask Enter()
