@@ -1,6 +1,4 @@
-﻿using CodeBase.Infrastructure.SceneManagement;
-
-namespace CodeBase.Infrastructure.Providers.SceneReference
+﻿namespace CodeBase.Infrastructure.SceneManagement.Providers.SceneReference
 {
     public interface ISceneReferenceProvider
     {

@@ -1,11 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CodeBase.Infrastructure.SceneManagement;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 
-namespace CodeBase.Infrastructure.Providers.SceneReference
+namespace CodeBase.Infrastructure.SceneManagement.Providers.SceneReference
 {
     [CreateAssetMenu(menuName = "Create ScenesSO", fileName = "ScenesSO", order = 51)]
     public class SOSceneReferenceProvider : ScriptableObject, ISceneReferenceProvider

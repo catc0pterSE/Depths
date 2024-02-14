@@ -1,5 +1,5 @@
 ﻿using System;
-using CodeBase.Infrastructure.Providers.SceneReference;
+using CodeBase.Infrastructure.SceneManagement.Providers.SceneReference;
 using CodeBase.UI.Loading;
 using Cysharp.Threading.Tasks;
 using UnityEngine.AddressableAssets;

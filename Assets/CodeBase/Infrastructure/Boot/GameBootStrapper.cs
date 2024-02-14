@@ -1,32 +1,29 @@
-using CodeBase.Common.Factories.GameStateMachineFactories;
-using CodeBase.Infrastructure.Providers.SceneReference;
 using CodeBase.Infrastructure.StateMachine;
 using CodeBase.UI.Loading;
 using UnityEngine;
 using Zenject;
 
-namespace CodeBase.Infrastructure.EntryPoint
+namespace CodeBase.Infrastructure.Boot
 {
     public class GameBootStrapper : MonoBehaviour
     {
         [SerializeField] private LoadingCurtain _loadingCurtain;
         
-        private IGameStateMachineFactory _gameStateMachineFactory;
+        private IGameStateMachine _gameStateMachine;
 
         [Inject]
         public GameBootStrapper Construct
         (
-            IGameStateMachineFactory gameStateMachine,
-            ISceneReferenceProvider sceneReferenceProvider
+            IGameStateMachine gameStateMachine
         )
         {
-            _gameStateMachineFactory = gameStateMachine;
+            _gameStateMachine = gameStateMachine;
             return this;
         }
 
         private void Awake()
         {
-            
+            _gameStateMachine.EnterBootStrapState();
         }
     }
 }
