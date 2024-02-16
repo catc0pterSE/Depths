@@ -7,7 +7,6 @@ namespace CodeBase.Infrastructure.StateMachine
     public interface IGameStateMachine
     {
         UniTask EnterBootStrapState();
-
         UniTask EnterMaiMenuState();
     }
 }

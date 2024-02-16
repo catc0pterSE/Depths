@@ -15,7 +15,6 @@ namespace CodeBase.Infrastructure.StateMachine.States
 
         public UniTask Enter()
         {
-            Debug.Log("Entered bootstrap state");
             return default;
         }
 
