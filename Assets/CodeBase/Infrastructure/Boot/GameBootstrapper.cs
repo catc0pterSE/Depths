@@ -1,18 +1,15 @@
 using CodeBase.Infrastructure.StateMachine;
-using CodeBase.UI.Loading;
 using UnityEngine;
 using Zenject;
 
 namespace CodeBase.Infrastructure.Boot
 {
-    public class GameBootStrapper : MonoBehaviour
+    public class GameBootstrapper : MonoBehaviour
     {
-        [SerializeField] private LoadingCurtain _loadingCurtain;
-        
         private IGameStateMachine _gameStateMachine;
 
         [Inject]
-        public GameBootStrapper Construct
+        public GameBootstrapper Construct
         (
             IGameStateMachine gameStateMachine
         )
