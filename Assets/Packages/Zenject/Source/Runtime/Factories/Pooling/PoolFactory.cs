@@ -14,7 +14,7 @@ namespace Zenject
             _pool = pool;
         }
 
-        public T Build()
+        public T Create()
         {
             return _pool.Spawn();
         }

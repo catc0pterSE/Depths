@@ -76,7 +76,7 @@ namespace Zenject
             }
             else
             {
-                buffer.Add(((IFactory<TContract>)factory).Build());
+                buffer.Add(((IFactory<TContract>)factory).Create());
             }
         }
     }
