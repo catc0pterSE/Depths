@@ -7,7 +7,7 @@ namespace CodeBase.Infrastructure.StateMachine.States
     public class BootstrapState : IParameterlessState
     {
         private readonly IGameStateMachine _stateMachine;
-        
+
         public BootstrapState(IGameStateMachine stateMachine)
         {
             _stateMachine = stateMachine;
@@ -15,6 +15,7 @@ namespace CodeBase.Infrastructure.StateMachine.States
 
         public UniTask Enter()
         {
+            Debug.Log("entered bootstrap state");
             return default;
         }
 

@@ -2,13 +2,13 @@
 
 namespace CodeBase.Common.StateMachine
 {
-    public interface IParameterState<TPayLoad> : IState
+    public interface IParameterState<TPayload> : IState
     {
-        UniTask Enter(TPayLoad payload);
+        UniTask Enter(TPayload payload);
     }
 
-    public interface IParameterState<TPayLoad1, TPayload2> : IState
+    public interface IParameterState<TPayload1, TPayload2> : IState
     {
-        UniTask Enter(TPayLoad1 payload1, TPayload2 payload2);
+        UniTask Enter(TPayload1 payload1, TPayload2 payload2);
     }
 }

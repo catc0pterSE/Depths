@@ -12,7 +12,7 @@ namespace CodeBase.Infrastructure.StateMachine.Factories
             _gameStatesFactory = gameStatesFactory;
         }
         
-        public IGameStateMachine Build()
+        public IGameStateMachine Create()
         {
             GameStateMachine gameStateMachine = new GameStateMachine();
 

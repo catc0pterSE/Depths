@@ -4,7 +4,7 @@ using CodeBase.Infrastructure.StateMachine.Factories;
 using UnityEngine;
 using Zenject;
 
-namespace CodeBase.Infrastructure.Boot.Installers
+namespace CodeBase.Infrastructure.Boot
 {
     public class BootInstaller : MonoInstaller
     {
@@ -18,10 +18,10 @@ namespace CodeBase.Infrastructure.Boot.Installers
         }
 
         private void BindSceneReferenceProvider() =>
-            Container.BindInterfacesTo<SOSceneReferenceProvider>().FromInstance(_sceneReferenceProvider).AsSingle().NonLazy();
+            Container.Bind<ISceneReferenceProvider>().FromInstance(_sceneReferenceProvider).AsSingle().NonLazy();
 
         private void BindGameStatesFactory() =>
-            Container.BindInterfacesTo<GameStatesFactory>().AsSingle().NonLazy();
+            Container.Bind<IGameStatesFactory>().To<GameStatesFactory>().AsSingle().NonLazy();
         
         private void BindGameStateMachine() =>
             Container.Bind<IGameStateMachine>().FromFactory<GameStateMachineBuilder>().AsSingle().NonLazy();

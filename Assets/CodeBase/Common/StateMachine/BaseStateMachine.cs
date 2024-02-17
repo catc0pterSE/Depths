@@ -19,15 +19,15 @@ namespace CodeBase.Common.StateMachine
             await newState.Enter();
         }
 
-        protected async UniTask Enter<TState, TPayLoad>(TPayLoad payload)
-            where TState : class, IParameterState<TPayLoad>
+        protected async UniTask Enter<TState, TPayload>(TPayload payload)
+            where TState : class, IParameterState<TPayload>
         {
             TState newState = await ChangeState<TState>();
             await newState.Enter(payload);
         }
 
-        protected async UniTask Enter<TState, TPayLoad1, TPayLoad2>(TPayLoad1 payload1, TPayLoad2 payload2)
-            where TState : class, IParameterState<TPayLoad1, TPayLoad2>
+        protected async UniTask Enter<TState, TPayload1, TPayload2>(TPayload1 payload1, TPayload2 payload2)
+            where TState : class, IParameterState<TPayload1, TPayload2>
         {
             TState newState = await ChangeState<TState>();
             await newState.Enter(payload1, payload2);
